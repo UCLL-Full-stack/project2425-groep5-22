@@ -2,56 +2,6 @@
  * @swagger
  * components:
  *   schemas:
- *     Tag:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           format: int64
- *           readOnly: true
- *         tag:
- *           type: string
- *           description: The tag name
- *         games:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Game'
- *           readOnly: true
- *         createdAt:
- *           type: string
- *           format: date-time
- *           readOnly: true
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           nullable: true
- *           readOnly: true
- *     Intensity:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           format: int64
- *         intensity:
- *           type: string
- *           description: The intensity level name
- *         order:
- *           type: integer
- *           description: The display order of the intensity
- *         games:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Game'
- *           readOnly: true
- *         createdAt:
- *           type: string
- *           format: date-time
- *           readOnly: true
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           nullable: true
- *           readOnly: true
  *     User:
  *       type: object
  *       properties:
