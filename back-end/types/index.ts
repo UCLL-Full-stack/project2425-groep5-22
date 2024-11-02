@@ -1,11 +1,12 @@
 type GameInput = {
+  id?: undefined,
   user: UserInput,
   intensity: IntensityInput,
   name: string,
   groups: boolean,
   duration: number,
   explanation: string,
-  tags: TagInput[]
+  tags: string[]
 }
 
 type IntensityInput = {
@@ -32,4 +33,12 @@ type UserInput = {
   name: string,
   email: string,
   password: string
+}
+
+export {
+  GameInput,
+  IntensityInput,
+  MediaInput,
+  TagInput,
+  UserInput
 }

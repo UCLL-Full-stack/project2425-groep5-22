@@ -39,7 +39,13 @@ const getIntensityById = ({ id }: { id: number }): Intensity | null => {
   return intensities.find(intensity => intensity.getId() === id) ?? null;
 };
 
+const createIntensity = ({ intensity }: { intensity: Intensity }): Intensity => {
+  intensities.push(intensity);
+  return intensity;
+}
+
 export default {
   getAllIntensities,
-  getIntensityById
+  getIntensityById,
+  createIntensity
 };

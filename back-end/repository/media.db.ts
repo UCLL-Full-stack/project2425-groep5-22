@@ -1,16 +1,22 @@
 import { Media } from "../model/media";
 
-const media: Media[] = []
+const medias: Media[] = []
 
 const getAllMedia = (): Media[] => {
-  return media;
+  return medias;
 };
 
 const getMediaById = ({ id }: { id: number }): Media | null => {
-  return media.find(media => media.getId() === id) ?? null;
+  return medias.find(media => media.getId() === id) ?? null;
 };
+
+const createMedia = ({ media }: { media: Media }): Media => {
+  medias.push(media);
+  return media;
+}
 
 export default {
   getAllMedia,
-  getMediaById
+  getMediaById,
+  createMedia
 };
