@@ -158,13 +158,13 @@ const Create = () => {
         )}
 
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-end items-center w-full">
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${isSubmitting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
+            className={`button ${isSubmitting
+              ? 'button-disabled'
+              : 'button-primary'
               }`}
           >
             {isSubmitting && <Loader />}

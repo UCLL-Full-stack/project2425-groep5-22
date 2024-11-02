@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.button {
+  @apply px-4 py-2 rounded-lg text-white flex items-center gap-2
+}
+
+.button-primary {
+  @apply bg-primary hover:bg-opacity-85
+}
+
+.button-disabled {
+  @apply bg-gray-600 hover:cursor-not-allowed
+}

@@ -70,7 +70,7 @@ const TagInput: React.FC<Props> = ({
             {tagInput && !filteredTags.find(tag => tag.tag.toLowerCase() === tagInput.toLowerCase()) && (
               <div
                 onClick={handleCreateTag}
-                className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-blue-600"
+                className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-primary"
               >
                 + Maak nieuwe tag "{tagInput}"
               </div>
@@ -83,14 +83,14 @@ const TagInput: React.FC<Props> = ({
         {selectedTags.map(tag => (
           <div
             key={tag}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 text-blue-800 rounded-full"
+            className="flex items-center gap-1 px-2 py-1 text-sm bg-primary/20 text-primary rounded-full"
           >
             {tag}
             <button
               onClick={() => onTagRemove(tag)}
-              className="p-1 hover:text-blue-600"
+              className=" rounded-full hover:bg-primary/30 transition-all px-2 py-0.5"
             >
-              x
+              X
             </button>
           </div>
         ))}

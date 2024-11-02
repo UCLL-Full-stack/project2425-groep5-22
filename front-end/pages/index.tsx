@@ -22,7 +22,7 @@ const Home = () => {
             <li><span className='font-bold'>Password:</span> password123</li>
           </ul>
           <Link href="/spel/aanmaken">
-            <button className='bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white flex items-center gap-2'>
+            <button className='button button-primary'>
               Spel Aanmaken
             </button>
           </Link>
