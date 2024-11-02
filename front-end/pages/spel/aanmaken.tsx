@@ -181,7 +181,7 @@ const Create = () => {
                 setErrors(prev => ({ ...prev, name: undefined }));
               }}
               placeholder="Geef mij een naam"
-              className="px-3 py-2 w-full rounded-lg bg-gray-200 text-gray-700 placeholder:text-gray-500 text-2xl font-bold"
+              className="input text-2xl font-bold"
             />
           </FormField>
 
@@ -196,7 +196,7 @@ const Create = () => {
                   }}
                   rows={20}
                   placeholder="Geef een beschrijving van je spel"
-                  className="px-3 py-2 w-full rounded-lg bg-gray-200 text-gray-700 placeholder:text-gray-500"
+                  className="input"
                 />
               </FormField>
             </div>
@@ -210,7 +210,7 @@ const Create = () => {
                     setGame(prev => ({ ...prev, duration: Number(e.target.value) }));
                     setErrors(prev => ({ ...prev, duration: undefined }));
                   }}
-                  className="px-3 py-2 w-full rounded-lg bg-gray-200 text-gray-700"
+                  className="input"
                   step={1}
                   min={0}
                 />
@@ -223,7 +223,7 @@ const Create = () => {
                     ...prev,
                     groups: e.target.value === 'true'
                   }))}
-                  className="px-3 py-2 w-full rounded-lg bg-gray-200 text-gray-700"
+                  className="input"
                 >
                   <option value="true">Ja</option>
                   <option value="false">Nee</option>
@@ -242,7 +242,7 @@ const Create = () => {
                       setErrors(prev => ({ ...prev, intensity: undefined }));
                     }
                   }}
-                  className="px-3 py-2 w-full rounded-lg bg-gray-200 text-gray-700"
+                  className="input"
                 >
                   <option value="">Selecteer intensiteit</option>
                   {intensities.map(intensity => (
