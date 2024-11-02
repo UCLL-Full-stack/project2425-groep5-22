@@ -64,7 +64,7 @@ const Create = () => {
 
 
   const validateForm = (): boolean => {
-    const newErrors: any = {};
+    const newErrors: { [Key: string]: string } = {};
 
     if (!game.name.trim()) {
       newErrors.name = 'Naam is verplicht';
@@ -136,7 +136,7 @@ const Create = () => {
   };
 
   if (isLoading) {
-    return <Loader fullScreen />;
+    return <Loader />;
   }
 
   return (
@@ -167,7 +167,6 @@ const Create = () => {
               : 'button-primary'
               }`}
           >
-            {isSubmitting && <Loader />}
             {isSubmitting ? 'Bezig met opslaan...' : 'Opslaan'}
           </button>
         </div>
