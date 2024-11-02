@@ -28,10 +28,9 @@ const intensities: Intensity[] = [
   })
 ]
 
-const getAllIntensities = ({ order = "asc" }: { order: "asc" | "desc" }): Intensity[] => {
+const getAllIntensities = ({ order }: { order: "asc" | "desc" }): Intensity[] => {
   return intensities.sort((a, b) => {
-    if (order === "desc") return a.getOrder() - b.getOrder();
-    return b.getOrder() - a.getOrder();
+    return order === "desc" ? b.getOrder() - a.getOrder() : a.getOrder() - b.getOrder()
   });
 };
 

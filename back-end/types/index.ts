@@ -1,5 +1,5 @@
 type GameInput = {
-  id?: undefined,
+  id?: number,
   user: UserInput,
   intensity: IntensityInput,
   name: string,

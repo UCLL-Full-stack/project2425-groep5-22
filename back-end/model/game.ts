@@ -52,7 +52,7 @@ export class Game {
       throw new Error('Intensity is required.');
     if (!game.name || game.name == "")
       throw new Error('Name is required.');
-    if (!game.groups)
+    if (game.groups == null)
       throw new Error('Groups is required.');
     if (!game.duration)
       throw new Error('Duration is required.');

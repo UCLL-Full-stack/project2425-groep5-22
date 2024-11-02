@@ -1,27 +1,22 @@
 import { Tag } from "../model/tag";
 
-let currentId: number = 5;
 const tags: Tag[] = [
   new Tag({
     id: 1,
-    tag: "Rustig"
+    tag: "Buiten"
   }),
   new Tag({
     id: 2,
-    tag: "Matig"
+    tag: "Binnen"
   }),
   new Tag({
     id: 3,
-    tag: "Zwaar"
+    tag: "Op een plein"
   }),
   new Tag({
     id: 4,
-    tag: "Hevig"
+    tag: "9-10 jaar"
   }),
-  new Tag({
-    id: 5,
-    tag: "Extreem"
-  })
 ]
 
 const getAllTags = (): Tag[] => {
