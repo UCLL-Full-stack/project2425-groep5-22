@@ -86,43 +86,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('given: games exist in database, when: getAllGames is called, then: all games are returned', () => {
-  // Given
-  gameDb.getAllGames = mockGameDbGetAllGames.mockReturnValue([game]);
-
-  // When
-  const result = gameService.getAllGames();
-
-  // Then
-  expect(result).toEqual([game]);
-  expect(mockGameDbGetAllGames).toHaveBeenCalledTimes(1);
-});
-
-test('given: game exists, when: getGameById is called, then: game is returned', () => {
-  // Given
-  gameDb.getGameById = mockGameDbGetGameById.mockReturnValue(game);
-
-  // When
-  const result = gameService.getGameById(1);
-
-  // Then
-  expect(result).toEqual(game);
-  expect(mockGameDbGetGameById).toHaveBeenCalledTimes(1);
-  expect(mockGameDbGetGameById).toHaveBeenCalledWith({ id: 1 });
-});
-
-test('given: game does not exist, when: getGameById is called, then: error is thrown', () => {
-  // Given
-  gameDb.getGameById = mockGameDbGetGameById.mockReturnValue(null);
-
-  // When
-  const getGame = () => gameService.getGameById(999);
-
-  // Then
-  expect(getGame).toThrow('Game with id 999 does not exist.');
-  expect(mockGameDbGetGameById).toHaveBeenCalledTimes(1);
-});
-
 test('given: valid game input with existing tags, when: createGame is called, then: game is created', () => {
   // Given
   userDb.getUserById = mockUserDbGetUserById.mockReturnValue(user);

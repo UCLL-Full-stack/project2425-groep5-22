@@ -8,16 +8,6 @@ import tagDb from '../repository/tag.db';
 import userDb from '../repository/user.db';
 import { GameInput } from '../types';
 
-const getAllGames = (): Game[] => {
-  return gameDb.getAllGames();
-}
-
-const getGameById = (id: number): Game => {
-  const lecturer: Game | null = gameDb.getGameById({ id: id });
-  if (lecturer == null) throw new Error(`Game with id ${id} does not exist.`);
-  return lecturer;
-}
-
 const createGame = ({ user, intensity, name, groups, duration, explanation, tags }: GameInput): Game => {
   // Check if the course and the lecturer have an id
   if (user.id == undefined) throw new Error('User id is required.');
@@ -55,7 +45,5 @@ const createGame = ({ user, intensity, name, groups, duration, explanation, tags
 }
 
 export default {
-  getAllGames,
-  getGameById,
   createGame
 }
