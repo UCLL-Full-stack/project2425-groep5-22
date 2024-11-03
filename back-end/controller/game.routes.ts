@@ -111,6 +111,31 @@ import { GameInput } from '../types';
 
 const gameRouter = express.Router();
 
+
+/**
+ * @swagger
+ * /games:
+ *   get:
+ *     summary: Get a list of all the games
+ *     responses:
+ *       200:
+ *         description: An array of game objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ */
+gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const games = await gameService.getAllGames();
+    res.status(200).json(games);
+  } catch (error) {
+    next(error);
+  }
+});
+
 /**
  * @swagger
  * /games:

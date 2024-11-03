@@ -65,7 +65,6 @@ const game = new Game({
 
 // Mock setup
 let mockGameDbGetAllGames: jest.Mock;
-let mockGameDbGetGameById: jest.Mock;
 let mockGameDbCreateGame: jest.Mock;
 let mockUserDbGetUserById: jest.Mock;
 let mockIntensityDbGetIntensityById: jest.Mock;
@@ -74,7 +73,6 @@ let mockTagDbCreateTag: jest.Mock;
 
 beforeEach(() => {
   mockGameDbGetAllGames = jest.fn();
-  mockGameDbGetGameById = jest.fn();
   mockGameDbCreateGame = jest.fn();
   mockUserDbGetUserById = jest.fn();
   mockIntensityDbGetIntensityById = jest.fn();
@@ -84,6 +82,16 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.clearAllMocks();
+});
+
+test('given: games exist in database, when: getAllGames is called, then: all games are returned', () => {
+  // Given
+  gameDb.getAllGames = mockGameDbGetAllGames.mockReturnValue([game]);
+  // When
+  const result = gameService.getAllGames();
+  // Then
+  expect(result).toEqual([game]);
+  expect(mockGameDbGetAllGames).toHaveBeenCalledTimes(1);
 });
 
 test('given: valid game input with existing tags, when: createGame is called, then: game is created', () => {
