@@ -4,8 +4,8 @@ import { Tag } from '@/types';
 type Props = {
   availableTags: Tag[],
   selectedTags: string[],
-  onTagSelect: any,
-  onTagRemove: any,
+  onTagSelect: Function,
+  onTagRemove: Function,
   error: string | undefined
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 type Props = {
   message: string,
-  onDismiss: any,
+  onDismiss: () => void,
   className: string
 }
 
