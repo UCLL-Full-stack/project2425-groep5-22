@@ -1,7 +1,7 @@
 import { Tag } from '../model/tag';
 import tagDb from '../repository/tag.db';
 
-const getAllTags = (): Tag[] => {
+const getAllTags = async (): Promise<Tag[]> => {
   return tagDb.getAllTags();
 }
 

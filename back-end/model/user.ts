@@ -1,46 +1,77 @@
 import { Game } from "./game";
+import {
+  Game as GamePrisma,
+  User as UserPrisma
+} from "@prisma/client"
 
 export class User {
   private id?: number;
-  private name: string;
+  private username: string;
   private email: string;
   private password: string;
-  private games: Game[] = [];
-  private createdAt: Date = new Date();
-  private updatedAt: Date | null = null;
+  private games: Game[];
+  private createdAt?: Date;
+  private updatedAt?: Date | null;
 
   constructor(user: {
     id?: number;
-    name: string;
+    username: string;
     email: string;
     password: string;
+    games?: Game[];
+    createdAt?: Date;
+    updatedAt?: Date | null
   }) {
     this.validate(user);
 
-
     this.id = user.id;
-    this.name = user.name;
+    this.username = user.username;
     this.email = user.email;
     this.password = user.password;
+    this.games = user.games ?? [];
+    this.createdAt = user.createdAt;
+    this.updatedAt = user.updatedAt
   }
 
   validate(user: {
     id?: number;
-    name: string;
+    username: string;
     email: string;
     password: string;
   }) {
-    if (!user.name || user.name == "") throw new Error('Name is required.');
-    if (!user.email || user.name == "") throw new Error('Email is required.');
+    if (!user.username || user.username == "") throw new Error('Name is required.');
+    if (!user.email || user.email == "") throw new Error('Email is required.');
     if (!user.password) throw new Error('Password is required.');
+  }
+
+  static from({
+    id,
+    username,
+    email,
+    password,
+    // games,
+    createdAt,
+    updatedAt
+  }: UserPrisma
+    //  & { games: GamePrisma[] }
+  ): User {
+    return new User({
+      id,
+      username,
+      email,
+      password,
+      // games: games.map((game) => Game.from(game)),
+      createdAt,
+      updatedAt
+    });
   }
 
   getId(): number | undefined {
     return this.id;
   }
 
-  getName(): string {
-    return this.name;
+  getUsername(): string {
+    return this.username;
   }
 
   getEmail(): string {
@@ -55,17 +86,17 @@ export class User {
     return this.games;
   }
 
-  getCreatedAt(): Date {
+  getCreatedAt(): Date | undefined {
     return this.createdAt;
   }
 
-  getUpdatedAt(): Date | null {
+  getUpdatedAt(): Date | null | undefined {
     return this.updatedAt;
   }
 
   equals(user: User): boolean {
     return (
-      this.name === user.getName() &&
+      this.username === user.getUsername() &&
       this.email === user.getEmail() &&
       this.password === user.getPassword() &&
       this.games.every((game, index) => game.equals(user.getGames()[index])) &&

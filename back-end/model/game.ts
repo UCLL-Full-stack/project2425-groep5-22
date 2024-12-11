@@ -1,6 +1,14 @@
 import { Intensity } from "./intensity";
-import { Tag } from "./tag";
+import {
+  Game as GamePrisma,
+  User as UserPrisma,
+  Intensity as IntensityPrisma,
+  Tag as TagPrisma,
+  Media as MediaPrisma,
+} from "@prisma/client"
 import { User } from "./user";
+import { Tag } from "./tag";
+import { Media } from "./media";
 
 export class Game {
   private id?: number;
@@ -11,8 +19,9 @@ export class Game {
   private duration: number;
   private explanation: string;
   private tags: Tag[];
-  private createdAt: Date = new Date();
-  private updatedAt: Date | null = null;
+  private medias: Media[];
+  private createdAt?: Date;
+  private updatedAt?: Date | null;
 
   constructor(game: {
     id?: number;
@@ -23,6 +32,9 @@ export class Game {
     duration: number;
     explanation: string;
     tags: Tag[];
+    medias?: Media[]
+    createdAt?: Date;
+    updatedAt?: Date | null
   }) {
     this.validate(game);
 
@@ -34,6 +46,9 @@ export class Game {
     this.duration = game.duration
     this.explanation = game.explanation;
     this.tags = game.tags;
+    this.medias = game.medias ?? [];
+    this.createdAt = game.createdAt;
+    this.updatedAt = game.updatedAt;
   }
 
   validate(game: {
@@ -60,6 +75,39 @@ export class Game {
       throw new Error('Explanation is required.');
     if (!game.tags)
       throw new Error('Tags is required.');
+  }
+
+  static from({
+    id,
+    name,
+    groups,
+    duration,
+    explanation,
+    user,
+    tags,
+    medias,
+    intensity,
+    createdAt,
+    updatedAt
+  }: GamePrisma & {
+    user: UserPrisma,
+    tags: TagPrisma[],
+    intensity: IntensityPrisma,
+    medias: MediaPrisma[]
+  }): Game {
+    return new Game({
+      id,
+      user: User.from(user),
+      name,
+      groups,
+      duration,
+      explanation,
+      tags: tags.map((tag) => Tag.from(tag)),
+      medias: medias.map((media) => Media.from(media)),
+      intensity: Intensity.from(intensity),
+      createdAt,
+      updatedAt
+    });
   }
 
   getId(): number | undefined {
@@ -94,11 +142,15 @@ export class Game {
     return this.tags;
   }
 
-  getCreatedAt(): Date {
+  getMedias(): Media[] {
+    return this.medias;
+  }
+
+  getCreatedAt(): Date | undefined {
     return this.createdAt;
   }
 
-  getUpdatedAt(): Date | null {
+  getUpdatedAt(): Date | null | undefined {
     return this.updatedAt;
   }
 
@@ -111,6 +163,7 @@ export class Game {
       this.duration === game.getDuration() &&
       this.explanation === game.getExplanation() &&
       this.tags.every((tag, index) => tag.equals(game.getTags()[index])) &&
+      this.medias.every((media, index) => media.equals(game.getMedias()[index])) &&
       this.createdAt === game.getCreatedAt() &&
       this.updatedAt === game.getUpdatedAt()
     );

@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  games     Game[]
+}
+
+model Intensity {
+  id        Int       @id @default(autoincrement())
+  intensity String
+  order     Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  Game      Game[]
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  tag       String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  Games     Game[]
+}
+
+model Game {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  intensityId Int
+  intensity   Intensity @relation(fields: [intensityId], references: [id])
+  name        String
+  groups      Boolean
+  duration    Int
+  explanation String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tags        Tag[]
+  medias      Media[]
+}
+
+model Media {
+  id        Int      @id @default(autoincrement())
+  name      String
+  file      String
+  filetype  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  gameId    Int
+  Game      Game     @relation(fields: [gameId], references: [id])
+}

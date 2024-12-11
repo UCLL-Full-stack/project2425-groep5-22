@@ -10,7 +10,7 @@ let validTags: Tag[];
 beforeEach(() => {
   validUser = new User({
     id: 1,
-    name: 'John Doe',
+    username: 'John Doe',
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });

@@ -18,9 +18,14 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('given: intensities exist in database, when: getAllIntensities is called, then: all intensities are returned', () => {
-  intensityDb.getAllIntensities = mockIntensityDbGetAllIntensities.mockReturnValue([intensity]);
-  const result = intensityService.getAllIntensities();
+test('given: intensities exist in database, when: getAllIntensities is called, then: all intensities are returned', async () => {
+  // Given
+  intensityDb.getAllIntensities = mockIntensityDbGetAllIntensities.mockResolvedValue([intensity]);
+
+  // When
+  const result = await intensityService.getAllIntensities();
+
+  // Then
   expect(result).toEqual([intensity]);
   expect(mockIntensityDbGetAllIntensities).toHaveBeenCalledTimes(1);
 });

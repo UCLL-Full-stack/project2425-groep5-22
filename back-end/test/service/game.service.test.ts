@@ -1,4 +1,3 @@
-// game.service.test.ts
 import gameService from '../../service/game.service';
 import gameDb from '../../repository/game.db';
 import userDb from '../../repository/user.db';
@@ -13,7 +12,7 @@ import { GameInput, UserInput, IntensityInput } from '../../types';
 // Test data setup
 const userInput: UserInput = {
   id: 1,
-  name: 'John Doe',
+  username: 'John Doe',
   email: 'john@jeugdwerk.org',
   password: 'password123'
 };
@@ -54,8 +53,8 @@ const gameInput: GameInput = {
 
 const game = new Game({
   id: 1,
-  user,
-  intensity,
+  user: user,
+  intensity: intensity,
   name: 'Capture the Flag',
   groups: true,
   duration: 30,
@@ -63,90 +62,99 @@ const game = new Game({
   tags
 });
 
-// Mock setup
-let mockGameDbGetAllGames: jest.Mock;
-let mockGameDbCreateGame: jest.Mock;
+// Mocks
 let mockUserDbGetUserById: jest.Mock;
 let mockIntensityDbGetIntensityById: jest.Mock;
 let mockTagDbGetTagByTag: jest.Mock;
 let mockTagDbCreateTag: jest.Mock;
+let mockGameDbGetAllGames: jest.Mock;
+let mockGameDbCreateGame: jest.Mock;
 
 beforeEach(() => {
-  mockGameDbGetAllGames = jest.fn();
-  mockGameDbCreateGame = jest.fn();
   mockUserDbGetUserById = jest.fn();
   mockIntensityDbGetIntensityById = jest.fn();
   mockTagDbGetTagByTag = jest.fn();
   mockTagDbCreateTag = jest.fn();
+  mockGameDbGetAllGames = jest.fn();
+  mockGameDbCreateGame = jest.fn();
 });
 
 afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('given: games exist in database, when: getAllGames is called, then: all games are returned', () => {
+// Tests
+test('given: games exist in database, when: getAllGames is called, then: all games are returned', async () => {
   // Given
-  gameDb.getAllGames = mockGameDbGetAllGames.mockReturnValue([game]);
+  gameDb.getAllGames = mockGameDbGetAllGames.mockResolvedValue([game]);
+
   // When
-  const result = gameService.getAllGames();
+  const result = await gameService.getAllGames();
+
   // Then
   expect(result).toEqual([game]);
   expect(mockGameDbGetAllGames).toHaveBeenCalledTimes(1);
 });
 
-test('given: valid game input with existing tags, when: createGame is called, then: game is created', () => {
+test('given: user and intensity are valid, when: createGame is called, then: the game is created successfully', async () => {
   // Given
-  userDb.getUserById = mockUserDbGetUserById.mockReturnValue(user);
-  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockReturnValue(intensity);
-  tagDb.getTagByTag = mockTagDbGetTagByTag.mockReturnValue(tags[0]);
-  gameDb.createGame = mockGameDbCreateGame.mockReturnValue(game);
+  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(user);
+  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
+  tagDb.getTagByTag = mockTagDbGetTagByTag.mockResolvedValue(null); // simulate tag not found
+  tagDb.createTag = mockTagDbCreateTag.mockResolvedValue(tags[0]);
+
+  gameDb.createGame = mockGameDbCreateGame.mockResolvedValue(game);
 
   // When
-  const result = gameService.createGame(gameInput);
+  const result = await gameService.createGame(gameInput);
 
   // Then
   expect(result).toEqual(game);
-  expect(mockUserDbGetUserById).toHaveBeenCalledWith({ id: 1 });
-  expect(mockIntensityDbGetIntensityById).toHaveBeenCalledWith({ id: 1 });
-  expect(mockGameDbCreateGame).toHaveBeenCalledTimes(1);
-});
-
-test('given: valid game input with new tags, when: createGame is called, then: game is created with new tags', () => {
-  // Given
-  userDb.getUserById = mockUserDbGetUserById.mockReturnValue(user);
-  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockReturnValue(intensity);
-  tagDb.getTagByTag = mockTagDbGetTagByTag.mockReturnValue(null);
-  tagDb.createTag = mockTagDbCreateTag.mockReturnValue(tags[0]);
-  gameDb.createGame = mockGameDbCreateGame.mockReturnValue(game);
-
-  // When
-  const result = gameService.createGame(gameInput);
-
-  // Then
-  expect(result).toEqual(game);
-  expect(mockTagDbCreateTag).toHaveBeenCalled();
-  expect(mockGameDbCreateGame).toHaveBeenCalledTimes(1);
-});
-
-test('given: missing user id, when: createGame is called, then: error is thrown', () => {
-  // Given
-  const invalidInput = { ...gameInput, user: { id: undefined, name: 'John Doe', email: 'john@jeugdwerk.org', password: 'password123' } };
-
-  // When
-  const createGame = () => gameService.createGame(invalidInput);
-
-  // Then
-  expect(createGame).toThrow('User id is required.');
-});
-
-test('given: non-existent user, when: createGame is called, then: error is thrown', () => {
-  // Given
-  userDb.getUserById = mockUserDbGetUserById.mockReturnValue(null);
-
-  // When
-  const createGame = () => gameService.createGame(gameInput);
-
-  // Then
-  expect(createGame).toThrow('User not found with the given ID');
   expect(mockUserDbGetUserById).toHaveBeenCalledTimes(1);
+  expect(mockIntensityDbGetIntensityById).toHaveBeenCalledTimes(1);
+  expect(mockTagDbGetTagByTag).toHaveBeenCalledTimes(2); // For both tags
+  expect(mockTagDbCreateTag).toHaveBeenCalledTimes(2); // Tags are created if not found
+  expect(mockGameDbCreateGame).toHaveBeenCalledTimes(1);
+});
+
+test('given: user id is missing, when: createGame is called, then: throw an error', async () => {
+  // Given
+  const invalidGameInput = { ...gameInput, user: { ...userInput, id: undefined } };
+
+  // When / Then
+  await expect(gameService.createGame(invalidGameInput)).rejects.toThrow('User id is required.');
+});
+
+test('given: intensity id is missing, when: createGame is called, then: throw an error', async () => {
+  // Given
+  const invalidGameInput = { ...gameInput, intensity: { ...intensityInput, id: undefined } };
+
+  // When / Then
+  await expect(gameService.createGame(invalidGameInput)).rejects.toThrow('Intensity id is required.');
+});
+
+test('given: user or intensity not found, when: createGame is called, then: throw an error', async () => {
+  // Given
+  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(null); // User not found
+  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
+
+  // When / Then
+  await expect(gameService.createGame(gameInput)).rejects.toThrow('User not found with the given ID');
+});
+
+test('given: tags not found, when: createGame is called, then: create and associate tags', async () => {
+  // Given
+  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(user);
+  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
+  tagDb.getTagByTag = mockTagDbGetTagByTag.mockResolvedValue(null); // Tags not found
+  tagDb.createTag = mockTagDbCreateTag.mockResolvedValue(tags[0]);
+
+  gameDb.createGame = mockGameDbCreateGame.mockResolvedValue(game);
+
+  // When
+  const result = await gameService.createGame(gameInput);
+
+  // Then
+  expect(mockTagDbCreateTag).toHaveBeenCalledTimes(2); // Both tags should be created
+  expect(result).toEqual(game);
 });

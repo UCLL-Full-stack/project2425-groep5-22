@@ -8,7 +8,7 @@
  *         id:
  *           type: integer
  *           format: int64
- *         name:
+ *         username:
  *           type: string
  *         email:
  *           type: string

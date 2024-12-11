@@ -8,31 +8,31 @@ import tagDb from '../repository/tag.db';
 import userDb from '../repository/user.db';
 import { GameInput } from '../types';
 
-const getAllGames = (): Game[] => {
+const getAllGames = async (): Promise<Game[]> => {
   return gameDb.getAllGames();
 }
 
-const createGame = ({ user, intensity, name, groups, duration, explanation, tags }: GameInput): Game => {
+const createGame = async ({ user, intensity, name, groups, duration, explanation, tags }: GameInput): Promise<Game> => {
   // Check if the course and the lecturer have an id
   if (user.id == undefined) throw new Error('User id is required.');
   if (intensity.id == undefined) throw new Error('Intensity id is required.');
 
   // Check if the course and lecturer exist
-  const userFound: User | null = userDb.getUserById({ id: user.id });
+  const userFound: User | null = await userDb.getUserById({ id: user.id });
   if (userFound == null) throw new Error('User not found with the given ID');
-  const intensityFound: Intensity | null = intensityDb.getIntensityById({ id: intensity.id });
+  const intensityFound: Intensity | null = await intensityDb.getIntensityById({ id: intensity.id });
   if (intensityFound == null) throw new Error('Intensity not found with the given ID');
 
   // Check if the tags exist and create if not
   const allTags: Tag[] = [];
-  tags.forEach((tag) => {
-    let tagFound = tagDb.getTagByTag({ tag: tag });
+  for (const tag of tags) {
+    let tagFound = await tagDb.getTagByTag({ tag: tag });
     if (tagFound == null) {
-      const createTag = new Tag({ tag: tag })
-      tagFound = tagDb.createTag({ tag: createTag })
+      const createTag = new Tag({ tag: tag });
+      tagFound = await tagDb.createTag({ tag: createTag });
     }
     allTags.push(tagFound);
-  });
+  }
 
   // Create the game
   const game = new Game({
@@ -43,10 +43,10 @@ const createGame = ({ user, intensity, name, groups, duration, explanation, tags
     duration: duration,
     explanation: explanation,
     tags: allTags,
-  })
+  });
 
-  return gameDb.createGame({ game: game })
-}
+  return gameDb.createGame({ game: game });
+};
 
 export default {
   getAllGames,

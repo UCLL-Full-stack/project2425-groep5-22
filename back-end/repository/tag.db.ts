@@ -1,44 +1,57 @@
 import { Tag } from "../model/tag";
+import database from "./database";
 
-const tags: Tag[] = [
-  new Tag({
-    id: 1,
-    tag: "Buiten"
-  }),
-  new Tag({
-    id: 2,
-    tag: "Binnen"
-  }),
-  new Tag({
-    id: 3,
-    tag: "Op een plein"
-  }),
-  new Tag({
-    id: 4,
-    tag: "9-10 jaar"
-  }),
-]
-
-const getAllTags = (): Tag[] => {
-  return tags;
+const getAllTags = async (): Promise<Tag[]> => {
+  try {
+    const result = await database.tag.findMany();
+    return result.map((tag) => Tag.from(tag));
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
 };
 
-const getTagById = ({ id }: { id: number }): Tag | null => {
-  return tags.find(tag => tag.getId() === id) ?? null;
+const getTagById = async ({ id }: { id: number }): Promise<Tag | null> => {
+  try {
+    const result = await database.tag.findUnique({
+      where: { id: id },
+    });
+    return result ? Tag.from(result) : null;
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
 };
 
-const getTagByTag = ({ tag }: { tag: string }): Tag | null => {
-  return tags.find(currTag => currTag.getTag() === tag) ?? null;
+const getTagByTag = async ({ tag }: { tag: string }): Promise<Tag | null> => {
+  try {
+    const result = await database.tag.findUnique({
+      where: { tag: tag },
+    });
+    return result ? Tag.from(result) : null;
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
 };
 
-const createTag = ({ tag }: { tag: Tag }): Tag => {
-  tags.push(tag);
-  return tag;
-}
+const createTag = async ({ tag }: { tag: Tag }): Promise<Tag> => {
+  try {
+    const result = await database.tag.create({
+      data: {
+        tag: tag.getTag(),
+      },
+    });
+    return Tag.from(result);
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Failed to create tag, see server logs for more details.');
+  }
+};
 
 export default {
   getAllTags,
   getTagById,
   getTagByTag,
-  createTag
+  createTag,
 };

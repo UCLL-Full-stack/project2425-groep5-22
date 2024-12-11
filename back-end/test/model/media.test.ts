@@ -8,7 +8,7 @@ let validGame: Game;
 beforeEach(() => {
   const validUser = new User({
     id: 1,
-    name: 'John Doe',
+    username: 'John Doe',
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });
@@ -27,7 +27,6 @@ beforeEach(() => {
 test('given: valid media parameters, when: media is created, then: media should be created successfully', () => {
   const media = new Media({
     id: 1,
-    game: validGame,
     name: 'Game Photo',
     file: 'photo.jpg',
     filetype: 'image/jpeg'
@@ -35,29 +34,15 @@ test('given: valid media parameters, when: media is created, then: media should 
 
   expect(media).toBeDefined();
   expect(media.getId()).toBe(1);
-  expect(media.getGame()).toBe(validGame);
   expect(media.getName()).toBe('Game Photo');
   expect(media.getFile()).toBe('photo.jpg');
   expect(media.getFiletype()).toBe('image/jpeg');
-});
-
-test('given: missing game, when: media is created, then: an error should be thrown', () => {
-  expect(() => {
-    new Media({
-      id: 1,
-      game: undefined as unknown as Game,
-      name: 'Game Photo',
-      file: 'photo.jpg',
-      filetype: 'image/jpeg'
-    });
-  }).toThrow('Game is required.');
 });
 
 test('given: empty name, when: media is created, then: an error should be thrown', () => {
   expect(() => {
     new Media({
       id: 1,
-      game: validGame,
       name: '',
       file: 'photo.jpg',
       filetype: 'image/jpeg'
@@ -69,7 +54,6 @@ test('given: empty file, when: media is created, then: an error should be thrown
   expect(() => {
     new Media({
       id: 1,
-      game: validGame,
       name: 'Game Photo',
       file: '',
       filetype: 'image/jpeg'
@@ -81,7 +65,6 @@ test('given: empty filetype, when: media is created, then: an error should be th
   expect(() => {
     new Media({
       id: 1,
-      game: validGame,
       name: 'Game Photo',
       file: 'photo.jpg',
       filetype: ''
@@ -92,7 +75,6 @@ test('given: empty filetype, when: media is created, then: an error should be th
 test('given: two identical media items, when: equals method is called, then: should return true', () => {
   const media1 = new Media({
     id: 1,
-    game: validGame,
     name: 'Game Photo',
     file: 'photo.jpg',
     filetype: 'image/jpeg'

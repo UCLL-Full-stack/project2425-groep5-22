@@ -1,21 +1,27 @@
 import { Game } from "./game";
+import {
+  Tag as TagPrisma,
+  Game as GamePrisma
+} from "@prisma/client"
 
 export class Tag {
   private id?: number;
   private tag: string;
-  private games: Game[] = [];
-  private createdAt: Date = new Date();
-  private updatedAt: Date | null = null;
+  private createdAt?: Date;
+  private updatedAt?: Date | null;
 
   constructor(tag: {
     id?: number;
     tag: string;
+    createdAt?: Date;
+    updatedAt?: Date | null
   }) {
     this.validate(tag);
 
-
     this.id = tag.id;
     this.tag = tag.tag;
+    this.createdAt = tag.createdAt;
+    this.updatedAt = tag.updatedAt;
   }
 
   validate(tag: {
@@ -23,6 +29,24 @@ export class Tag {
     tag: string;
   }) {
     if (!tag.tag || tag.tag == "") throw new Error('Tag is required.');
+  }
+
+  static from({
+    id,
+    tag,
+    // games,
+    createdAt,
+    updatedAt
+  }: TagPrisma
+    //  & { games: GamePrisma[] }
+  ): Tag {
+    return new Tag({
+      id,
+      tag,
+      // games: games.map((game) => Game.from(game)),
+      createdAt,
+      updatedAt
+    });
   }
 
   getId(): number | undefined {
@@ -33,22 +57,17 @@ export class Tag {
     return this.tag;
   }
 
-  getGames(): Game[] {
-    return this.games;
-  }
-
-  getCreatedAt(): Date {
+  getCreatedAt(): Date | undefined {
     return this.createdAt;
   }
 
-  getUpdatedAt(): Date | null {
+  getUpdatedAt(): Date | null | undefined {
     return this.updatedAt;
   }
 
   equals(tag: Tag): boolean {
     return (
       this.tag === tag.getTag() &&
-      this.games.every((game, index) => game.equals(tag.getGames()[index])) &&
       this.createdAt === tag.getCreatedAt() &&
       this.updatedAt === tag.getUpdatedAt()
     );

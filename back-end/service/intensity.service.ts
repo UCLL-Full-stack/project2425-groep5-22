@@ -1,7 +1,7 @@
 import { Intensity } from '../model/intensity';
 import intensityDb from '../repository/intensity.db';
 
-const getAllIntensities = (): Intensity[] => {
+const getAllIntensities = async (): Promise<Intensity[]> => {
   return intensityDb.getAllIntensities({ order: "asc" });
 }
 

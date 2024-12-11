@@ -1,50 +1,49 @@
 import { Intensity } from "../model/intensity";
+import database from "./database";
 
-const intensities: Intensity[] = [
-  new Intensity({
-    id: 1,
-    intensity: "Rustig",
-    order: 1
-  }),
-  new Intensity({
-    id: 2,
-    intensity: "Matig",
-    order: 2
-  }),
-  new Intensity({
-    id: 3,
-    intensity: "Zwaar",
-    order: 3
-  }),
-  new Intensity({
-    id: 4,
-    intensity: "Hevig",
-    order: 4
-  }),
-  new Intensity({
-    id: 5,
-    intensity: "Extreem",
-    order: 5
-  })
-]
-
-const getAllIntensities = ({ order }: { order: "asc" | "desc" }): Intensity[] => {
-  return intensities.sort((a, b) => {
-    return order === "desc" ? b.getOrder() - a.getOrder() : a.getOrder() - b.getOrder()
-  });
+const getAllIntensities = async ({ order }: { order: "asc" | "desc" }): Promise<Intensity[]> => {
+  try {
+    const result = await database.intensity.findMany({
+      orderBy: {
+        order: order, // Ordering by the "order" field
+      },
+    });
+    return result.map((intensity) => Intensity.from(intensity));
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
 };
 
-const getIntensityById = ({ id }: { id: number }): Intensity | null => {
-  return intensities.find(intensity => intensity.getId() === id) ?? null;
+const getIntensityById = async ({ id }: { id: number }): Promise<Intensity | null> => {
+  try {
+    const result = await database.intensity.findUnique({
+      where: { id: id },
+    });
+    return result ? Intensity.from(result) : null;
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
 };
 
-const createIntensity = ({ intensity }: { intensity: Intensity }): Intensity => {
-  intensities.push(intensity);
-  return intensity;
-}
+const createIntensity = async ({ intensity }: { intensity: Intensity }): Promise<Intensity> => {
+  try {
+    const result = await database.intensity.create({
+      data: {
+        intensity: intensity.getIntensity(),
+        order: intensity.getOrder(),
+      },
+    });
+    return Intensity.from(result);
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Failed to create intensity, see server logs for more details.');
+  }
+};
 
 export default {
   getAllIntensities,
   getIntensityById,
-  createIntensity
+  createIntensity,
 };
