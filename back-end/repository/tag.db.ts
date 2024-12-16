@@ -1,5 +1,5 @@
 import { Tag } from "../model/tag";
-import database from "./database";
+import database from "../util/database";
 
 const getAllTags = async (): Promise<Tag[]> => {
   try {

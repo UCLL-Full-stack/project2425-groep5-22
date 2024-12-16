@@ -107,15 +107,24 @@
  */
 import express, { NextFunction, Request, Response } from 'express';
 import gameService from '../service/game.service';
-import { GameInput } from '../types';
+import { GameInput, Role } from '../types';
+
+// Custom type that extends the basic Request to fix type errors
+interface AuthenticatedRequest extends Request {
+  auth?: {
+    email: string;
+    role: Role;
+  };
+}
 
 const gameRouter = express.Router();
-
 
 /**
  * @swagger
  * /games:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a list of all the games
  *     responses:
  *       200:
@@ -127,8 +136,9 @@ const gameRouter = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Game'
  */
-gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+gameRouter.get('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const { email, role } = req.auth || {};
     const games = await gameService.getAllGames();
     res.status(200).json(games);
   } catch (error) {
@@ -140,6 +150,8 @@ gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
  * @swagger
  * /games:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Create a new game
  *     requestBody:
  *       required: true
@@ -155,8 +167,9 @@ gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
  *             schema:
  *               $ref: '#/components/schemas/Game'
  */
-gameRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
+gameRouter.post('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const { email, role } = req.auth || {};
     const gameInput = <GameInput>req.body;
     const response = await gameService.createGame(gameInput);
     res.status(200).json(response);

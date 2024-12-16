@@ -9,6 +9,7 @@ beforeEach(() => {
   const validUser = new User({
     id: 1,
     username: 'John Doe',
+    role: "guest",
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });

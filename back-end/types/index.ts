@@ -1,3 +1,5 @@
+type Role = "superadmin" | "admin" | "guest";
+
 type GameInput = {
   id?: number,
   user: UserInput,
@@ -31,14 +33,23 @@ type TagInput = {
 type UserInput = {
   id?: number,
   username: string,
+  role: Role,
   email: string,
   password: string
 }
 
+type AuthenticationResponse = {
+  token: string;
+  email: string;
+  role: Role;
+};
+
 export {
+  Role,
   GameInput,
   IntensityInput,
   MediaInput,
   TagInput,
-  UserInput
+  UserInput,
+  AuthenticationResponse
 }

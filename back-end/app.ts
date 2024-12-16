@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import { gameRouter } from './controller/game.routes';
 import { tagRouter } from './controller/tag.routes';
 import { intensityRouter } from './controller/intensity.routes';
+import { expressjwt } from 'express-jwt';
 
 const app = express();
 dotenv.config();
@@ -14,6 +15,15 @@ const port = process.env.APP_PORT || 3000;
 
 app.use(cors({ origin: 'http://localhost:8080' }));
 app.use(bodyParser.json());
+
+app.use(
+    expressjwt({
+        secret: process.env.JWT_SECRET || 'default_secret',
+        algorithms: ['HS256'],
+    }).unless({
+        path: ['/api-docs', /^\/api-docs\/.*/, '/users/login', '/users/signup', '/status']
+    })
+);
 
 app.use('/games', gameRouter);
 app.use('/tags', tagRouter);
@@ -42,9 +52,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         message = err.message
     }
 
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({ status: 'unauthorized', message: err.message });
+    }
+
     res.status(400).json({ status: 'application error', message: err.message })
 })
 
 app.listen(port || 3000, () => {
-    console.log(`Back-end is running on port http://localhost:${port}.`);
+    console.log(`Back-end is running: http://localhost:${port}.`);
 });

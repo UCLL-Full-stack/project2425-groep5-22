@@ -2,6 +2,7 @@ import { Game } from '../../model/game';
 import { User } from '../../model/user';
 import { Intensity } from '../../model/intensity';
 import { Tag } from '../../model/tag';
+import { Role } from '../../types';
 
 let validUser: User;
 let validIntensity: Intensity;
@@ -11,6 +12,7 @@ beforeEach(() => {
   validUser = new User({
     id: 1,
     username: 'John Doe',
+    role: "guest",
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });

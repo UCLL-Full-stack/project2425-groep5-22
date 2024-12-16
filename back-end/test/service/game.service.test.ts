@@ -13,6 +13,7 @@ import { GameInput, UserInput, IntensityInput } from '../../types';
 const userInput: UserInput = {
   id: 1,
   username: 'John Doe',
+  role: "guest",
   email: 'john@jeugdwerk.org',
   password: 'password123'
 };

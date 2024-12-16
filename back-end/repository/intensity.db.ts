@@ -1,5 +1,5 @@
 import { Intensity } from "../model/intensity";
-import database from "./database";
+import database from "../util/database";
 
 const getAllIntensities = async ({ order }: { order: "asc" | "desc" }): Promise<Intensity[]> => {
   try {

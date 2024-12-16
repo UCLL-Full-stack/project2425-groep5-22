@@ -1,12 +1,13 @@
+import { Role } from "../types";
 import { Game } from "./game";
 import {
-  Game as GamePrisma,
   User as UserPrisma
 } from "@prisma/client"
 
 export class User {
   private id?: number;
   private username: string;
+  private role: Role;
   private email: string;
   private password: string;
   private games: Game[];
@@ -16,6 +17,7 @@ export class User {
   constructor(user: {
     id?: number;
     username: string;
+    role: Role;
     email: string;
     password: string;
     games?: Game[];
@@ -26,6 +28,7 @@ export class User {
 
     this.id = user.id;
     this.username = user.username;
+    this.role = user.role;
     this.email = user.email;
     this.password = user.password;
     this.games = user.games ?? [];
@@ -47,6 +50,7 @@ export class User {
   static from({
     id,
     username,
+    role,
     email,
     password,
     // games,
@@ -58,6 +62,7 @@ export class User {
     return new User({
       id,
       username,
+      role: role as Role,
       email,
       password,
       // games: games.map((game) => Game.from(game)),
@@ -73,6 +78,11 @@ export class User {
   getUsername(): string {
     return this.username;
   }
+
+  getRole(): Role {
+    return this.role;
+  }
+
 
   getEmail(): string {
     return this.email;
@@ -97,6 +107,7 @@ export class User {
   equals(user: User): boolean {
     return (
       this.username === user.getUsername() &&
+      this.role === user.getRole() &&
       this.email === user.getEmail() &&
       this.password === user.getPassword() &&
       this.games.every((game, index) => game.equals(user.getGames()[index])) &&

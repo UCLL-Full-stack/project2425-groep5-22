@@ -1,5 +1,5 @@
 import { Game } from "../model/game";
-import database from "./database"; // This should import your Prisma database client
+import database from "../util/database"; // This should import your Prisma database client
 
 const getAllGames = async (): Promise<Game[]> => {
   try {

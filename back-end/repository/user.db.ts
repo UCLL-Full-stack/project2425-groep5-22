@@ -1,5 +1,5 @@
 import { User } from "../model/user";
-import database from "./database";
+import database from "../util/database";
 
 const getAllUsers = async (): Promise<User[]> => {
   try {
@@ -27,7 +27,33 @@ const getUserById = async ({ id }: { id: number }): Promise<User | null> => {
   }
 };
 
-const createUser = async ({ user }: { user: User }): Promise<User> => {
+const getUserByEmail = async ({ email }: { email: string }): Promise<User | null> => {
+  try {
+    const result = await database.user.findUnique({
+      where: { email: email },
+      include: { games: true },
+    });
+    return result ? User.from(result) : null;
+  } catch (e) {
+    console.error('Database Error', e)
+    throw new Error('Database Error, see server logs for more details.')
+  }
+};
+
+const getUserByUsername = async ({ username }: { username: string }): Promise<User | null> => {
+  try {
+    const result = await database.user.findUnique({
+      where: { username: username },
+      include: { games: true },
+    });
+    return result ? User.from(result) : null;
+  } catch (e) {
+    console.error('Database Error', e)
+    throw new Error('Database Error, see server logs for more details.')
+  }
+};
+
+const createUser = async (user: User): Promise<User> => {
   try {
     const result = await database.user.create({
       data: {
@@ -46,5 +72,7 @@ const createUser = async ({ user }: { user: User }): Promise<User> => {
 export default {
   getAllUsers,
   getUserById,
+  getUserByUsername,
+  getUserByEmail,
   createUser
 };

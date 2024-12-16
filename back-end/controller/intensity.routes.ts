@@ -31,6 +31,15 @@
  */
 import express, { NextFunction, Request, Response } from 'express';
 import intensityService from '../service/intensity.service';
+import { Role } from '../types';
+
+// Custom type that extends the basic Request to fix type errors
+interface AuthenticatedRequest extends Request {
+  auth?: {
+    email: string;
+    role: Role;
+  };
+}
 
 const intensityRouter = express.Router();
 
@@ -38,6 +47,8 @@ const intensityRouter = express.Router();
  * @swagger
  * /intensities:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a list of all intensity levels
  *     responses:
  *       200:
@@ -49,8 +60,9 @@ const intensityRouter = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Intensity'
  */
-intensityRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+intensityRouter.get('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const { email, role } = req.auth || {};
     const intensities = await intensityService.getAllIntensities();
     res.status(200).json(intensities);
   } catch (error) {

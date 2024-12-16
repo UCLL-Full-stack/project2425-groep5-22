@@ -1,6 +1,6 @@
 import { Game } from "../model/game";
 import { Media } from "../model/media";
-import database from "./database";
+import database from "../util/database";
 
 const getAllMedia = async (): Promise<Media[]> => {
   try {

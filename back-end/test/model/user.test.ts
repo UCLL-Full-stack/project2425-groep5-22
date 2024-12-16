@@ -4,6 +4,7 @@ test('given: valid user parameters, when: user is created, then: user should be 
   const user = new User({
     id: 1,
     username: 'John Doe',
+    role: "guest",
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });
@@ -21,6 +22,7 @@ test('given: empty name, when: user is created, then: an error should be thrown'
     new User({
       id: 1,
       username: '',
+      role: "guest",
       email: 'john@jeugdwerk.org',
       password: 'password123'
     });
@@ -32,6 +34,7 @@ test('given: empty email, when: user is created, then: an error should be thrown
     new User({
       id: 1,
       username: 'John Doe',
+      role: "guest",
       email: '',
       password: 'password123'
     });
@@ -43,6 +46,7 @@ test('given: missing password, when: user is created, then: an error should be t
     new User({
       id: 1,
       username: 'John Doe',
+      role: "guest",
       email: 'john@jeugdwerk.org',
       password: ''
     });
@@ -53,6 +57,7 @@ test('given: two identical users, when: equals method is called, then: should re
   const user1 = new User({
     id: 1,
     username: 'John Doe',
+    role: "guest",
     email: 'john@jeugdwerk.org',
     password: 'password123'
   });
