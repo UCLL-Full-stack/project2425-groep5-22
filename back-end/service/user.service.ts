@@ -1,17 +1,34 @@
 import { User } from '../model/user';
 import userDB from '../repository/user.db';
-import { AuthenticationResponse, Role, UserInput } from '../types';
+import { AuthenticationResponse, Role, UserInput, UserSimple } from '../types';
 import bcrypt from 'bcrypt';
 import jwt from '../util/jwt'
 
 const getAllUsers = async (): Promise<User[]> => userDB.getAllUsers();
 
-const getUserByUsername = async ({ username }: { username: string }): Promise<User> => {
-  const user = await userDB.getUserByUsername({ username });
+const getUserByEmail = async ({ email }: { email: string }): Promise<User> => {
+  const user = await userDB.getUserByEmail({ email });
   if (!user) {
-    throw new Error(`User with username: ${username} does not exist.`);
+    throw new Error(`User with email: ${email} does not exist.`);
   }
   return user;
+};
+
+const getUserByUsername = async ({ username, role = "guest" }: { username: string, role?: Role }): Promise<User | UserSimple> => {
+  const user = await userDB.getUserByUsername({ username });
+  if (!user) {
+    throw new Error(`User with id: ${username} does not exist.`);
+  }
+
+  if (role === "admin" || role === "superadmin") {
+    return user;
+  }
+
+  return {
+    id: user.getId(),
+    email: user.getEmail(),
+    username: user.getUsername()
+  } as UserSimple;
 };
 
 const createUser = async ({
@@ -59,4 +76,4 @@ const authenticate = async ({ email, password }: UserInput): Promise<Authenticat
   }
 }
 
-export default { getUserByUsername, getAllUsers, createUser, authenticate };
+export default { getUserByEmail, getUserByUsername, getAllUsers, createUser, authenticate };

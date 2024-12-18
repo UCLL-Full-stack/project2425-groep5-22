@@ -1,13 +1,14 @@
 export type Game = {
   id?: number,
-  // user: UserInput,
-  user?: any,
+  user: User,
   intensity: Intensity,
   name: string,
   groups: boolean,
   duration: number,
   explanation: string,
-  tags: string[]
+  tags: (string | Tag)[],
+  createdAt?: Date,
+  updatedAt?: Date
 }
 
 export type Tag = {
@@ -21,6 +22,30 @@ export type Intensity = {
   id?: number,
   intensity: string,
   order: number,
-  createdAt: Date,
-  updatedAt: Date
+  createdAt?: Date,
+  updatedAt?: Date
+}
+
+export type Role = 'superadmin' | 'admin' | 'guest';
+
+export type User = {
+  id?: number,
+  username?: string,
+  email?: string,
+  password?: string,
+  games?: Game[],
+  role?: Role,
+  createdAt?: Date,
+  updatedAt?: Date
+}
+
+export type AuthenticationResponse = {
+  token: string,
+  email: string,
+  role: string
+}
+
+export type AuthStatus = {
+  status: boolean,
+  user?: User
 }

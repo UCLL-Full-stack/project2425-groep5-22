@@ -32,6 +32,7 @@ const Home = () => {
       setCurrentUser(authUser);
     } catch (e) {
       console.error('Something went wrong while checking authentication', e)
+      throw new Error('Something went wrong while checking authentication');
     }
   };
 
@@ -40,8 +41,7 @@ const Home = () => {
     try {
       const response = await gameService.getGames();
       const result: Game[] = await response.json();
-      if (result.length > 0)
-        setGames(result.slice(0, 6));
+      setGames(result);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -72,30 +72,9 @@ const Home = () => {
       <Navbar user={currentUser ?? {} as User} />
 
       <div className="min-h-screen px-5 py-10 space-y-10 3xl:px-0">
-        <header className="relative z-0 w-full h-full overflow-x-hidden bg-center bg-no-repeat bg-cover rounded-2xl" style={{
-          backgroundImage: "url('https://jeugdwerk.org/images/header.jpg')"
-        }}>
-          <div className="w-full h-full bg-black bg-cover bg-opacity-40">
-            <div className="grid px-3 py-16 sm:pt-20 sm:px-12 place-items-center">
-              <div className="w-full sm:w-[36rem] text-center py-8">
-                <p className="text-xl font-bold text-white sm:text-3xl">
-                  Ontdek de wereld van jeugdwerk. Door animatoren, voor animatoren</p>
-                <p className="mt-1 text-white">
-                  Jeugdwerk is een platform gemaakt voor animatoren om inspiratie op te doen en te delen met elkaar
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
         <main>
           <section className="px-4 py-4 mx-auto xl:px-0">
             <div className="mx-auto">
-              <div className="items-end justify-between sm:flex">
-                <h2 className="max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">
-                  Spelletjes
-                </h2>
-              </div>
-
               <GameGrid>
                 {games.map((game) => (
                   <div key={game.id} className="space-y-3">
@@ -104,11 +83,6 @@ const Home = () => {
                   </div>
                 ))}
               </GameGrid>
-              <div className="flex items-center justify-center w-full mt-3">
-                <Link href="/spelletjes">
-                  <Button>Bekijk meer spelletjes <ArrowRight /></Button>
-                </Link>
-              </div>
             </div>
           </section>
         </main>

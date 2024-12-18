@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#641661",
+        games: "#A279F9",
       },
     },
   },

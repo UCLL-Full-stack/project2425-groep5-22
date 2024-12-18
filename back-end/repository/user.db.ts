@@ -14,11 +14,9 @@ const getAllUsers = async (): Promise<User[]> => {
 };
 
 const getUserById = async ({ id }: { id: number }): Promise<User | null> => {
-  // return users.find(user => user.getId() === id) ?? null;
   try {
     const result = await database.user.findUnique({
       where: { id: id },
-      include: { games: true },
     });
     return result ? User.from(result) : null;
   } catch (e) {

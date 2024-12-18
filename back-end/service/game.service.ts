@@ -12,6 +12,15 @@ const getAllGames = async (): Promise<Game[]> => {
   return gameDb.getAllGames();
 }
 
+const getGame = async ({ id }: { id: number }): Promise<Game> => {
+  const game = await gameDb.getGameById({ id });
+  if (!game) {
+    throw new Error(`Game with id: ${game} does not exist.`);
+  }
+
+  return game;
+}
+
 const createGame = async ({ user, intensity, name, groups, duration, explanation, tags }: GameInput): Promise<Game> => {
   // Check if the course and the lecturer have an id
   if (user.id == undefined) throw new Error('User id is required.');
@@ -50,5 +59,6 @@ const createGame = async ({ user, intensity, name, groups, duration, explanation
 
 export default {
   getAllGames,
-  createGame
+  createGame,
+  getGame
 }

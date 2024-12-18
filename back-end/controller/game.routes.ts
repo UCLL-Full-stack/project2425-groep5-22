@@ -109,14 +109,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import gameService from '../service/game.service';
 import { GameInput, Role } from '../types';
 
-// Custom type that extends the basic Request to fix type errors
-interface AuthenticatedRequest extends Request {
-  auth?: {
-    email: string;
-    role: Role;
-  };
-}
-
 const gameRouter = express.Router();
 
 /**
@@ -136,10 +128,48 @@ const gameRouter = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Game'
  */
-gameRouter.get('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, role } = req.auth || {};
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
     const games = await gameService.getAllGames();
+    res.status(200).json(games);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get a game
+ *     parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *              required: true
+ *              description: The game id.
+ *     responses:
+ *       200:
+ *         description: The game objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ */
+gameRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
+    const games = await gameService.getGame({
+      id: Number(request.params.id)
+    });
     res.status(200).json(games);
   } catch (error) {
     next(error);
@@ -167,9 +197,10 @@ gameRouter.get('/', async (req: AuthenticatedRequest, res: Response, next: NextF
  *             schema:
  *               $ref: '#/components/schemas/Game'
  */
-gameRouter.post('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+gameRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, role } = req.auth || {};
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
     const gameInput = <GameInput>req.body;
     const response = await gameService.createGame(gameInput);
     res.status(200).json(response);

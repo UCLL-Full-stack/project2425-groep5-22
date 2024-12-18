@@ -12,11 +12,6 @@
  *         tag:
  *           type: string
  *           description: The tag name
- *         games:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Game'
- *           readOnly: true
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -30,14 +25,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import tagService from '../service/tag.service';
 import { Role } from '../types';
-
-// Custom type that extends the basic Request to fix type errors
-interface AuthenticatedRequest extends Request {
-  auth?: {
-    email: string;
-    role: Role;
-  };
-}
 
 const tagRouter = express.Router();
 
@@ -58,9 +45,10 @@ const tagRouter = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Tag'
  */
-tagRouter.get('/', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+tagRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, role } = req.auth || {};
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
     const tags = await tagService.getAllTags();
     res.status(200).json(tags);
   } catch (error) {

@@ -20,7 +20,7 @@ model User {
 
 model Intensity {
   id        Int       @id @default(autoincrement())
-  intensity String
+  intensity String    @unique
   order     Int
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

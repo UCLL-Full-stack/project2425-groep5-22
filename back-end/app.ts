@@ -8,8 +8,12 @@ import { gameRouter } from './controller/game.routes';
 import { tagRouter } from './controller/tag.routes';
 import { intensityRouter } from './controller/intensity.routes';
 import { expressjwt } from 'express-jwt';
+import { userRouter } from './controller/user.routes';
+import helmet from 'helmet';
 
 const app = express();
+app.use(helmet());
+
 dotenv.config();
 const port = process.env.APP_PORT || 3000;
 
@@ -28,6 +32,7 @@ app.use(
 app.use('/games', gameRouter);
 app.use('/tags', tagRouter);
 app.use('/intensities', intensityRouter);
+app.use('/users', userRouter);
 
 app.get('/status', (req, res) => {
     res.json({ message: 'Back-end is running...' });
@@ -54,6 +59,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
     if (err.name === 'UnauthorizedError') {
         res.status(401).json({ status: 'unauthorized', message: err.message });
+        return;
     }
 
     res.status(400).json({ status: 'application error', message: err.message })

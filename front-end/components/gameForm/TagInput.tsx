@@ -3,7 +3,7 @@ import { Tag } from '@/types';
 
 type Props = {
   availableTags: Tag[],
-  selectedTags: string[],
+  selectedTags: (Tag | string)[],
   onTagSelect: Function,
   onTagRemove: Function,
   error: string | undefined
@@ -21,9 +21,12 @@ const TagInput: React.FC<Props> = ({
   const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
 
   useEffect(() => {
+    // Filter availableTags by checking if the tag is already selected
     const filtered = availableTags.filter(tag =>
       tag.tag.toLowerCase().includes(tagInput.toLowerCase()) &&
-      !selectedTags.includes(tag.tag)
+      !selectedTags.some(selectedTag =>
+        typeof selectedTag === 'string' ? selectedTag === tag.tag : selectedTag.tag === tag.tag
+      )
     );
     setFilteredTags(filtered);
   }, [tagInput, availableTags, selectedTags]);
@@ -82,13 +85,13 @@ const TagInput: React.FC<Props> = ({
       <div className="flex flex-wrap gap-2">
         {selectedTags.map(tag => (
           <div
-            key={tag}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-primary/20 text-primary rounded-full"
+            key={typeof tag === 'string' ? tag : tag.tag} // Use tag or tag.tag as the key
+            className="flex items-center gap-1 px-2 py-1 text-sm rounded-full bg-primary/20 text-primary"
           >
-            {tag}
+            {typeof tag === 'string' ? tag : tag.tag} {/* Use tag or tag.tag based on type */}
             <button
               onClick={() => onTagRemove(tag)}
-              className=" rounded-full hover:bg-primary/30 transition-all px-2 py-0.5"
+              className="rounded-full hover:bg-primary/30 transition-all px-2 py-0.5"
             >
               X
             </button>

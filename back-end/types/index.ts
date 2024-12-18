@@ -44,6 +44,12 @@ type AuthenticationResponse = {
   role: Role;
 };
 
+type UserSimple = {
+  id?: number,
+  email: string,
+  username: string
+}
+
 export {
   Role,
   GameInput,
@@ -51,5 +57,6 @@ export {
   MediaInput,
   TagInput,
   UserInput,
+  UserSimple,
   AuthenticationResponse
 }

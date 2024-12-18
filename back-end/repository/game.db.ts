@@ -29,7 +29,7 @@ const getAllGames = async (): Promise<Game[]> => {
 const getGameById = async ({ id }: { id: number }): Promise<Game | null> => {
   try {
     const result = await database.game.findUnique({
-      where: { id },
+      where: { id: id },
       include: {
         user: true,
         intensity: true,

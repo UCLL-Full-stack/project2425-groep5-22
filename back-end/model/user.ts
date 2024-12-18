@@ -53,11 +53,9 @@ export class User {
     role,
     email,
     password,
-    // games,
     createdAt,
     updatedAt
   }: UserPrisma
-    //  & { games: GamePrisma[] }
   ): User {
     return new User({
       id,
@@ -65,7 +63,6 @@ export class User {
       role: role as Role,
       email,
       password,
-      // games: games.map((game) => Game.from(game)),
       createdAt,
       updatedAt
     });

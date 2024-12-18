@@ -1,8 +1,12 @@
 @tailwind base;
 @tailwind components;
 
+body {
+  @apply bg-gray-100;
+}
+
 .button {
-  @apply px-4 py-2 rounded-lg text-white flex items-center gap-2;
+  @apply px-4 py-2 rounded-lg text-white flex items-center gap-2 text-sm;
 }
 
 .button-primary {
@@ -10,7 +14,7 @@
 }
 
 .button-disabled {
-  @apply bg-gray-600 hover:cursor-not-allowed;
+  @apply bg-primary/75 hover:cursor-not-allowed;
 }
 
 .input {
