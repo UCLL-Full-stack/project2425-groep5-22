@@ -31,7 +31,7 @@ const Navbar: React.FC<Props> = ({ user }) => {
   const handleLogout = () => {
     console.log("Logging out...");
     sessionStorage.removeItem("loggedInUser");
-    router.push("/login");
+    router.push("/login?status=loggedOut");
   };
 
   return (

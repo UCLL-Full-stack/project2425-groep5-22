@@ -10,7 +10,7 @@ import { GameInput, UserInput, IntensityInput } from '../../types';
 // Test data setup
 const userInput: UserInput = {
   id: 1,
-  username: 'John Doe',
+  username: 'JohnD',
   role: "guest",
   email: 'john@jeugdwerk.org',
   password: 'password123'
@@ -145,12 +145,12 @@ test('given: valid username with games, when: getUserGames is called, then: user
   jest.spyOn(gameDb, 'getGamesByUser').mockResolvedValue([game]);
 
   // When
-  const result = await gameService.getUserGames('John Doe');
+  const result = await gameService.getUserGames('JohnD');
 
   // Then
   expect(result).toEqual([game]);
-  expect(userDb.getUserByUsername).toHaveBeenCalledWith({ username: 'John Doe' });
-  expect(gameDb.getGamesByUser).toHaveBeenCalledWith({ username: 'John Doe' });
+  expect(userDb.getUserByUsername).toHaveBeenCalledWith({ username: 'JohnD' });
+  expect(gameDb.getGamesByUser).toHaveBeenCalledWith({ username: 'JohnD' });
 });
 
 test('given: username does not exist, when: getUserGames is called, then: error is thrown', async () => {

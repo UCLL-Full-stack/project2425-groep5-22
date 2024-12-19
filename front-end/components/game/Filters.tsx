@@ -12,14 +12,13 @@ type Props = {
   setFilters: Function,
   handleFilterChange: Function
   loading: boolean,
-  handleApplyFilters: () => void,
   tags: Tag[],
   intensities: Intensity[]
 }
 
-const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange, loading, handleApplyFilters, tags, intensities }) => {
+const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange, loading, tags, intensities }) => {
   return (
-    <div className="mb-6 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">Tags</label>
         <TagInput
@@ -86,15 +85,6 @@ const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange,
             handleFilterChange('duration', e.target.value ? Number(e.target.value) : null)
           }
         />
-      </div>
-
-      <div className="flex justify-end md:col-span-2 lg:col-span-4">
-        <div className="flex-col text-center justify-center items-center">
-          <Button onClick={handleApplyFilters} loading={loading}>Toepassen</Button>
-          <a href="/spelletjes" className='underline text-sm hover:opacity-75'>
-            Herstellen
-          </a>
-        </div>
       </div>
     </div>
   );

@@ -8,26 +8,15 @@ import Loader from '@/components/Loader';
 import GameGrid from '@/components/game/Grid';
 import GameCard from '@/components/game/Card';
 import Author from '@/components/game/Author';
-import Button from '@/components/Button';
 import Navbar from '@/components/Navbar';
-import ErrorAlert from '@/components/ErrorAlert';
+import Alert from '@/components/Alert';
 import intensityService from '@/services/IntensityService';
 import tagService from '@/services/TagService';
-import TagInput from '@/components/gameForm/TagInput';
 import FilterInput from '@/components/game/Filters';
+import useSWR from 'swr';
 
-const Home = () => {
+const Games = () => {
   const router = useRouter();
-
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [games, setGames] = useState<Game[]>([]);
-  const [intensities, setIntensities] = useState<Intensity[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
-
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  // Filter state
   const [filters, setFilters] = useState<Filter>({
     tags: [],
     intensityId: null,
@@ -36,94 +25,70 @@ const Home = () => {
   });
 
   const checkAuth = async () => {
-    try {
-      const { status, user: authUser } = await userService.checkAuth();
-      if (!status || !authUser) {
-        router.push('/login');
-        return;
-      }
-
-      setCurrentUser(authUser);
-    } catch (e) {
-      console.error('Something went wrong while checking authentication', e);
-      throw new Error('Something went wrong while checking authentication');
+    const { status, user } = await userService.checkAuth();
+    if (!status || !user) {
+      router.push('/login?status=notLoggedIn');
     }
+    return user;
   };
 
-  const fetchData = async () => {
-    try {
-      const intensitiesResponse = await intensityService.getAll()
-      const intensitiesData: Intensity[] = await intensitiesResponse.json();
-      setIntensities(intensitiesData);
+  const fetchIntensitiesAndTags = async () => {
+    const [intensitiesResponse, tagsResponse] = await Promise.all([
+      intensityService.getAll(),
+      tagService.getAll(),
+    ]);
 
-      const tagsResponse = await tagService.getAll()
-      const tagsData: Tag[] = await tagsResponse.json();
-      setTags(tagsData);
-    } catch (error) {
-      setError('Er is een fout opgetreden bij het laden van de gegevens');
-      console.error('Error fetching data:', error);
-    }
+    const intensities: Intensity[] = await intensitiesResponse.json();
+    const tags: Tag[] = await tagsResponse.json();
+
+    return { intensities, tags };
   };
 
-  const fetchGames = async () => {
+  const fetchGamesWithFilters = async (filters: Filter) => {
     try {
-      setLoading(true);
       let response;
-
-      // Conditional fetching based on filters
       if (
         filters.tags.length > 0 ||
         filters.intensityId !== null ||
         filters.groups !== null ||
         (filters.duration !== null && filters.duration > 0)
       ) {
-        // Call the service with filters
         response = await gameService.getFilteredGames(filters);
       } else {
-        // Call the service without filters
         response = await gameService.getGames();
       }
 
-      // Check if the response is valid
       if (!response || !response.ok) {
-        console.error('Er is iets misgelopen', response ? response.statusText : 'No response');
-        setError('Er is iets misgelopen, probeer het later opnieuw.');
-        return; // Early return if the response is invalid
+        throw new Error('Er is iets misgelopen, probeer het later opnieuw.');
       }
 
-      // Parse the JSON result from the response
-      const result = await response.json();
-      setGames(result); // Set the games to state
+      const games: Game[] = await response.json();
+
+      return games;
     } catch (error) {
-      // Handle unexpected errors
       console.error('Error fetching data:', error);
-      setError('Er is iets misgelopen, probeer het later opnieuw.');
-    } finally {
-      setLoading(false); // Set loading to false after the request finishes
+      throw new Error('Er is iets misgelopen, probeer het later opnieuw.');
     }
   };
 
+  const { data: currentUser, error: authError } = useSWR('auth', checkAuth);
 
-  useEffect(() => {
-    const effect = async () => {
-      await checkAuth();
-      await fetchData()
-      await fetchGames();
-    };
+  const {
+    data: intensitiesAndTags,
+    error: intensitiesTagsError,
+  } = useSWR(currentUser ? 'intensitiesTags' : null, fetchIntensitiesAndTags);
 
-    effect();
-  }, []);
+  const { data: games, error: gamesError, isValidating } = useSWR(
+    currentUser && intensitiesAndTags ? ['games', filters] : null,
+    ([, filters]) => fetchGamesWithFilters(filters)
+  );
 
   // Handle filter changes
   const handleFilterChange = (key: keyof typeof filters, value: any) => {
     setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
   };
 
-  const handleApplyFilters = () => {
-    fetchGames();
-  };
-
-  if (loading) return <Loader />;
+  if (!currentUser || !intensitiesAndTags || authError) return <Loader />;
 
   return (
     <>
@@ -138,47 +103,50 @@ const Home = () => {
 
       <div className="min-h-screen px-5 py-10 space-y-10 3xl:px-0">
         <main>
-          {error && (
-            <ErrorAlert
-              message={error}
-              onDismiss={() => setError('')}
+          {(gamesError || intensitiesTagsError) && (
+            <Alert
+              message="Er is iets misgelopen, probeer het later opnieuw."
               className="mb-4"
             />
           )}
 
-          <section className="px-4 py-4 mx-auto xl:px-0">
-            {/* Filter UI */}
-            <FilterInput
-              filters={filters}
-              setFilters={setFilters}
-              handleApplyFilters={handleApplyFilters}
-              handleFilterChange={handleFilterChange}
-              loading={loading}
-              tags={tags}
-              intensities={intensities}
-            />
+          {intensitiesAndTags && intensitiesAndTags !== undefined && (
+            <section className="px-4 py-4 mx-auto xl:px-0">
+              {/* Filter UI */}
+              <FilterInput
+                filters={filters}
+                setFilters={setFilters}
+                handleFilterChange={handleFilterChange}
+                loading={isValidating}
+                tags={intensitiesAndTags.tags as Tag[]}
+                intensities={intensitiesAndTags.intensities as Intensity[]}
+              />
 
-
-            {/* Games Grid */}
-            <div className="mx-auto w-full">
-              {games.length > 0 ? (
-                <GameGrid>
-                  {games.map((game) => (
-                    <div key={game.id} className="space-y-3">
-                      <GameCard game={game} />
-                      <Author user={game.user} />
-                    </div>
-                  ))}
-                </GameGrid>
-              ) : (
-                <p className='text-center py-10'>Er werden spijtig genoeg geen spellen gevonden 😢.</p>
-              )}
-            </div>
-          </section>
+              {/* Games Grid */}
+              <div className="w-full mx-auto">
+                {isValidating ? (
+                  <Loader />
+                ) : games && games.length > 0 ? (
+                  <GameGrid>
+                    {games.map((game) => (
+                      <div key={game.id} className="space-y-3">
+                        <GameCard game={game} />
+                        <Author user={game.user} />
+                      </div>
+                    ))}
+                  </GameGrid>
+                ) : (
+                  <p className="py-10 text-center">
+                    Er werden spijtig genoeg geen spellen gevonden 😢.
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
         </main>
       </div>
     </>
   );
 };
 
-export default Home;
+export default Games;

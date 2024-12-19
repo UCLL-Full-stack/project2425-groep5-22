@@ -3,12 +3,12 @@ import { Clock, Group, Pen, Trash, Link, Download, Share, Users, PersonStanding 
 import { Game, Tag, User } from '@/types';
 import Button from '../Button';
 import GameService from '@/services/GameService';
-import ErrorAlert from '../ErrorAlert';
+import Alert from '../Alert';
 import { useRouter } from 'next/router';
 
 type Props = {
   game: Game;
-  user: User | null;
+  user: User;
 };
 
 const GameDetails: React.FC<Props> = ({ game, user }) => {
@@ -56,7 +56,7 @@ const GameDetails: React.FC<Props> = ({ game, user }) => {
         <div className="w-full p-3 sm:p-5 md:p-7 lg:p-0">
           <div className="my-10 space-y-5">
             {error && (
-              <ErrorAlert
+              <Alert
                 message={error}
                 onDismiss={() => setError('')}
                 className="mb-4"
@@ -70,7 +70,7 @@ const GameDetails: React.FC<Props> = ({ game, user }) => {
             </div>
 
             <div className="flex flex-col space-y-3 sm:space-y-0 sm:space-x-4 sm:flex-row sm:justify-between md:block md:space-x-0 md:space-y-4 md:absolute top-16 right-4 sm:right-6 lg:right-8">
-              {user?.id === game.user.id && (
+              {user.id === game.user.id && (
                 <div className="flex space-x-2 md:space-x-0 md:space-y-2 md:block">
                   <a href={`/bewerken/${game.id}`}>
                     <Button>

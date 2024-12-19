@@ -42,8 +42,15 @@ export class User {
     email: string;
     password: string;
   }) {
-    if (!user.username || user.username == "") throw new Error('Name is required.');
+    if (!user.username || user.username == "") throw new Error('Username is required.');
+    if (user.username.includes(" ") || /[^a-zA-Z0-9_-]/.test(user.username)) {
+      throw new Error("Username can't include spaces and special characters.");
+    }
     if (!user.email || user.email == "") throw new Error('Email is required.');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for validating email
+    if (!emailRegex.test(user.email)) {
+      throw new Error('Invalid email format.');
+    }
     if (!user.password) throw new Error('Password is required.');
   }
 

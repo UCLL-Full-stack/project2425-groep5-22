@@ -2,6 +2,9 @@
   "login": {
     "title": "Login",
     "noAccount": "Don't have an account?",
+    "redirectTitle": "Authentication",
+    "notLoggedIn": "You are not logged in yet, you need to log in first before you can proceed.",
+    "loggedOut": "Logout has been successfull.",
     "registerHere": "Register here.",
     "errorMessages": {
       "authenticationError": "Something went wrong while checking authentication, please try again later",

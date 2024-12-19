@@ -12,53 +12,39 @@ import Author from '@/components/game/Author';
 import Button from '@/components/Button';
 import { ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import useSWR from 'swr';
+import Alert from '@/components/Alert';
 
 const Home = () => {
   const router = useRouter();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [games, setGames] = useState<Game[]>([]);
-
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
   const checkAuth = async () => {
-    try {
-      const { status, user: authUser } = await userService.checkAuth();
-      if (!status || !authUser) {
-        router.push('/login')
-        return;
-      }
-
-      setCurrentUser(authUser);
-    } catch (e) {
-      console.error('Something went wrong while checking authentication', e)
+    const { status, user } = await userService.checkAuth();
+    if (!status || !user) {
+      router.push('/login?status=notLoggedIn');
     }
+    return user;
   };
 
+  const getRandomGames = async () => {
+    const response = await gameService.getGamesRandom()
+    const games: Game[] = await response.json();
 
-  const fetchData = async () => {
-    try {
-      const response = await gameService.getGamesRandom();
-      const result: Game[] = await response.json();
-      if (result.length > 0)
-        setGames(result.slice(0, 6));
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return games;
+  }
 
-  useEffect(() => {
-    const effect = async () => {
-      await checkAuth();
-      await fetchData();
-    };
+  const {
+    data: currentUser,
+    error: authError,
+  } = useSWR('auth', checkAuth)
 
-    effect();
-  }, []);
+  const {
+    data: games,
+    error: gamesError,
+    isLoading,
+  } = useSWR(currentUser ? 'randomGames' : null, getRandomGames);
 
-  if (loading) return <Loader />
+  if (!currentUser || isLoading || authError) return <Loader />
 
   return (
     <>
@@ -96,14 +82,21 @@ const Home = () => {
                 </h2>
               </div>
 
-              <GameGrid>
-                {games.map((game) => (
-                  <div key={game.id} className="space-y-3">
-                    <GameCard game={game} />
-                    <Author user={game.user} />
-                  </div>
-                ))}
-              </GameGrid>
+              {gamesError && (
+                <Alert
+                  message={gamesError}
+                />
+              )}
+              {games && games !== undefined && (
+                <GameGrid>
+                  {games.map((game) => (
+                    <div key={game.id} className="space-y-3">
+                      <GameCard game={game} />
+                      <Author user={game.user} />
+                    </div>
+                  ))}
+                </GameGrid>
+              )}
               <div className="flex items-center justify-center w-full mt-3">
                 <Link href="/spelletjes">
                   <Button>Bekijk meer spelletjes <ArrowRight /></Button>

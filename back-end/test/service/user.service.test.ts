@@ -11,7 +11,7 @@ test('given: valid credentials, when: authenticate is called, then: authenticati
   const hashedPassword = await bcrypt.hash('password123', 12);
   const user = new User({
     id: 1,
-    username: 'John Doe',
+    username: 'JohnD',
     email: 'john@jeugdwerk.org',
     password: hashedPassword,
     role: 'guest'

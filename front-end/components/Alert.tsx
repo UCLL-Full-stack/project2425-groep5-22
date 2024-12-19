@@ -1,27 +1,31 @@
 import React from 'react';
 
 type Props = {
+  title?: string,
   message: string,
-  onDismiss: () => void,
-  className: string
+  onDismiss?: () => void,
+  className?: string,
+  type?: "error" | "success"
 }
 
-const ErrorAlert: React.FC<Props> = ({
+const Alert: React.FC<Props> = ({
+  title,
   message,
   onDismiss,
-  className = ""
+  className,
+  type = "error"
 }) => {
   return (
-    <div className={`p-4 rounded-lg bg-red-50 border border-red-200 ${className}`}>
+    <div className={`p-4 rounded-lg ${type === "error" ? "bg-red-50 border border-red-200" : "bg-green-50 border border-green-200"} ${className}`}>
       <div className="flex items-start gap-3">
         <div className="flex-1">
-          <h3 className="font-semibold text-red-800">Er is een fout opgetreden</h3>
-          <p className="mt-1 text-sm text-red-700">{message}</p>
+          <h3 className={`font-semibold ${type === "error" ? "text-red-800" : "text-green-800"}`}>{title ?? "Er is een fout opgetreden"}</h3>
+          <p className={`mt-1 text-sm ${type === "error" ? "text-red-700" : "text-green-700"}`}>{message}</p>
         </div>
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="text-red-500 hover:text-red-700"
+            className={`font-semibold ${type === "error" ? "text-red-500 hover:text-red-700" : "text-green-500 hover:green-red-700"}`}
           >
             <span className="sr-only">Sluiten</span>
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -34,4 +38,4 @@ const ErrorAlert: React.FC<Props> = ({
   );
 };
 
-export default ErrorAlert;
+export default Alert;

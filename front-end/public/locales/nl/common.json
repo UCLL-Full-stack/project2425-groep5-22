@@ -2,6 +2,9 @@
   "login": {
     "title": "Login",
     "noAccount": "Nog geen account?",
+    "redirectTitle": "Authenticatie",
+    "notLoggedIn": "Je bent nog niet ingelogd, je moet je eerst aanmelden voordat je verder kan gaan.",
+    "loggedOut": "Logout has been successfull.",
     "registerHere": "Registreer hier.",
     "errorMessages": {
       "authenticationError": "Er ging iets mis met authenticatie te controlleren, probeer het later opnieuw",
