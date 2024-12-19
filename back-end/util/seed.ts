@@ -9,19 +9,8 @@ const main = async () => {
   // Clear existing data
   await prisma.game.deleteMany();
   await prisma.tag.deleteMany();
-  await prisma.media.deleteMany();
   await prisma.intensity.deleteMany();
   await prisma.user.deleteMany();
-
-  // Create tags
-  await prisma.tag.createMany({
-    data: [
-      { tag: "Buiten" },
-      { tag: "Binnen" },
-      { tag: "Op een plein" },
-      { tag: "9-10 jaar" }
-    ]
-  });
 
   // Create intensities
   const intensities = [
@@ -58,35 +47,263 @@ const main = async () => {
   const adminPass = await bcrypt.hash("Admin!123", 10);
   const guestPass = await bcrypt.hash("Guest!123", 10);
 
-  await prisma.user.createMany({
-    data: [
-      {
-        username: "Superadmin",
-        email: "superadmin@jeugdwerk.org",
-        password: superadminPass,
-        role: "superadmin"
-      },
-      {
-        username: "Admin",
-        email: "admin@jeugdwerk.org",
-        password: adminPass,
-        role: "admin"
-      },
-      {
-        username: "Guest",
-        email: "guest@jeugdwerk.org",
-        password: guestPass,
-        role: "guest"
-      }
-    ]
+  const superadmin = await prisma.user.create({
+    data: {
+      username: "Superadmin",
+      email: "superadmin@jeugdwerk.org",
+      password: superadminPass,
+      role: "superadmin"
+    }
   });
 
+  const admin = await prisma.user.create({
+    data: {
+      username: "Admin",
+      email: "admin@jeugdwerk.org",
+      password: adminPass,
+      role: "admin"
+    }
+  });
+
+  const guest = await prisma.user.create({
+    data: {
+      username: "Guest",
+      email: "guest@jeugdwerk.org",
+      password: guestPass,
+      role: "guest"
+    }
+  });
+
+  await prisma.game.create({
+    data: {
+      name: "Touwtrekken",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Zwaar"].id
+        },
+      },
+      groups: true,
+      duration: 30,
+      explanation: "Twee teams trekken aan een touw in tegenovergestelde richtingen. Het team dat het touw over een bepaald punt trekt, wint.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Estafette",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 45,
+      explanation: "Een klassiek estafettespel waarbij teams tegen elkaar strijden door een parcours te lopen en een voorwerp van de ene naar de andere speler over te dragen.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Snelheid" }, create: { tag: "Snelheid" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Blikgooien",
+      user: {
+        connect: {
+          id: guest.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 20,
+      explanation: "Zet een piramide van blikken op en laat de kinderen proberen de blikken om te gooien met een bal.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Nauwkeurigheid" }, create: { tag: "Nauwkeurigheid" } },
+          { where: { tag: "Balspel" }, create: { tag: "Balspel" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Zaklopen",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 30,
+      explanation: "Spelers stoppen zichzelf in een zak en springen naar de finishlijn. De eerste die de finish bereikt, wint.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Snelheid" }, create: { tag: "Snelheid" } },
+          { where: { tag: "Simpel" }, create: { tag: "Simpel" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Scharenspringen",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 25,
+      explanation: "Twee spelers houden een touw vast en draaien het. De andere spelers moeten eroverheen springen zonder het touw te raken.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Snelheid" }, create: { tag: "Snelheid" } },
+          { where: { tag: "Reactievermogen" }, create: { tag: "Reactievermogen" } },
+          { where: { tag: "Beweging" }, create: { tag: "Beweging" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Spijkerpoepen",
+      user: {
+        connect: {
+          id: guest.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 30,
+      explanation: "Aan een stuk touw wordt een spijker bevestigd. De spelers moeten de spijker in een fles zien te krijgen zonder hun handen te gebruiken.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Nauwkeurigheid" }, create: { tag: "Nauwkeurigheid" } },
+          { where: { tag: "Geduld" }, create: { tag: "Geduld" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Luchtballonrace",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        },
+      },
+      groups: true,
+      duration: 20,
+      explanation: "Gebruik ballonnen die de spelers moeten blazen om een race te winnen. De eerste die zijn ballon opblaast en het doel bereikt, wint.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Snelheid" }, create: { tag: "Snelheid" } },
+          { where: { tag: "Lucht" }, create: { tag: "Lucht" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Wisselspel",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Zwaar"].id
+        },
+      },
+      groups: true,
+      duration: 30,
+      explanation: "Elke speler moet snel van positie veranderen zonder de anderen te laten merken. Dit spel test het reactievermogen en de snelheid.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Snelheid" }, create: { tag: "Snelheid" } },
+          { where: { tag: "Reactievermogen" }, create: { tag: "Reactievermogen" } },
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Beweging" }, create: { tag: "Beweging" } }
+        ]
+      }
+    }
+  })
+  await prisma.game.create({
+    data: {
+      name: "Blinde dobbelsteen",
+      user: {
+        connect: {
+          id: guest.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Rustig"].id
+        },
+      },
+      groups: true,
+      duration: 15,
+      explanation: "De speler is geblinddoekt en moet proberen een dobbelsteen te rollen naar een doel, zonder te zien waar hij het gooit.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Nauwkeurigheid" }, create: { tag: "Nauwkeurigheid" } }
+        ]
+      }
+    }
+  })
   await prisma.game.create({
     data: {
       name: "Één tegen allen",
       user: {
         connect: {
-          id: matse.id
+          id: superadmin.id
         }
       },
       intensity: {
@@ -96,7 +313,7 @@ const main = async () => {
       },
       groups: true,
       duration: 130,
-      explanation: "Speluitleg\nEr wordt aan de spelers een lijst met allemaal verschillende opdrachten gegeven, het is de bedoeling dat alle opdrachten met succes worden volbracht.\nBij één tegen alle wordt er een lijst van allemaal verschillende opdrachten aan de spelers gegeven, het doen van het spel is dat de spelers al deze opdrachten zo snel mogelijk tot een goed einde volbrengen.\nDe opdrachten kunnen aangepast worden per leeftijd, thema, weersomstandigheden, ....\nVariatie\nVariatie 1 Als variatie op het spel kan er gekozen worden om de spelers op te delen in een 2 groepen.\nVariatie 2 Voor de 2de variatie worden de spelers weer in 2 groepen opgedeeld.\nHierbij moeten de 2 groepen opdrachten voor elkaar verzinnen.\nAls al de opdrachten verzonnen zijn krijgen beide groepen even de tijd om de opdrachten door te lezen waarna elke groep 1 opdracht mag terug sturen en 1 opdracht mag schrappen.\nDe groep die als eerste alle opdrachten tot een goed einde brengt wint.\nVoorbeeld opdrachten\nKnijp zoveel mogelijk wasknijpers op je oren.\nVerzamel lippenstiftkusjes van alle spelers.\nDoe een klusje in het lokaal of op het terrein (papiertjes rapen, iets opruimen, enz.).\nMaak een dierenketting met 20 dieren.\nHoger-lager: Leg tien foto’s van leden in willekeurige volgorde naast elkaar.\nDe beeldzijde mag niet zichtbaar zijn.\nDraai de foto’s een na een om.\nDe spelers moeten raden of de volgende persoon ouder of jonger zal zijn.\nHoe oud is de leiding? Raad de juiste leeftijd van de leid(st)er.\nSchrijf een elfje (elf woorden op vijf dichtregels: 1-2-3-4-1).\nEet om het eerste drie beschuiten op en fluit het liedje ‘Broeder Jakob’.\nSchat één minuut juist in.\nLeg met je tenen een knoop in een touw.\nSlijp een potlood tot er niets meer overblijft.\nZoek voor alle letters in het alfabet een jongens- of meisjesnaam.\nLos een rebus op.\nZing drie liedjes waar het woord liefde in voorkomt.\nZeg het alfabet achterstevoren op.\nRijg een touw door je kleren en dat van je medespelers: je begint bij je hals, het touw komt er aan je voeten weer uit en gaat langs de broekspijp van je buur naar zijn of haar hals, enz.\nMaak een cartoon van elk van je medespelers.\nDe leiding moet kunnen raden wie het is.\nPraat een minuut over een brooddoos.\nJe mag geen ‘euh’ zeggen.\nVerzin een liedje op een bekende melodie.\nGa met de hele groep op één stoel staan.\nSchrijf een liefdesbrief naar de leiding.\nBreng de leiding aan het lachen.\nZet een stok recht op de grond.\nZet je voorhoofd tegen de stok.\nDraai tien rondjes en probeer over de stok te springen.\nSchil een aardappel in één lange schil.\nZeg zo lang mogelijk ‘AAA’.\nJe mag geen adem halen.\nZoek een schat op het terrein.\nJe krijgt daarvoor een schatkaart.\nVerzamel euromuntjes uit acht verschillende landen.\nTel exact tweehonderd rijstkorrels.\nGorgel een liedje.\nDe leiding moet het kunnen raden.\nBedenk vijf spreekwoorden over het weer.\nZoek 25 groene voorwerpen.\nDoe een blinddoek aan, draai tien rondjes en probeer nu naar de overkant van het terrein te stappen.\nBind een touw rond je middel met daaraan een balpen geknoopt.\nZorg dat de pen net onder je knieën hangt.\nProbeer de pen in een flesje te krijgen.\nJe mag je handen niet gebruiken.\nGa met je voeten tegen elkaar staan.\nLeg een koekje op je voet.\nProbeer dat koekje zo snel mogelijk op te eten.\nJe mag je handen niet gebruiken.\nGeraak geblinddoekt door een doolhof.\nJe medespelers mogen helpen.\nBreng met een spons het water van de ene emmer naar een andere over.\nKnoop twee meter gekookte spaghettislierten aan elkaar.\nLeg een parcours af met een knikker op een lepel in je mond.\nMaak een levende piramide van minstens vier verdiepingen.\nBlaas een ballon op, laat hem (zonder dat je hem knoopt) los en vang hem weer op.\nVertaal een zin in drie verschillende talen.\nGa in een cirkel staan en geef een sinaasappel door.\nJe moet hem tussen je kin en nek klemmen en je mag je handen niet gebruiken.\nWerp vanop twee meter afstand twintig kroonkurken in een schaaltje.\nHerken geblinddoekt een aantal smaken: mosterd, citroen, suiker, enz.\nMastermind.\nKraak de code van de leiding.\nSchrijf met letters uit een krant: “Dit is het allerbeste spel ooit!”\nHaal om het eerste een draad door het oog van een naald.\nDans per twee een slow terwijl jullie elk het uiteinde van een spaghettistokje in je mond houden.\nHet duo dat het langst kan slowen zonder dat hun stokje breekt, wint.\nVerzamel zoveel personen dat de som van hun schoenmaten exact 200 is.\nPuzzel een in stukken geknipte foto in elkaar.\nZeg tien keer na elkaar ‘de kat krabt de krollen van de trap’.\nJe mag geen fouten maken.\nVertel een verhaal in de p-taal.\nElke klinker herhaal je met een P ertussen.\n‘Daan gaat naar zee’ wordt dus: daa-p-aan gaa-p-aat naa-p-aar de-p-e zee-p-ee.\nRen om het snelst achterwaarts het spelterrein over.\nNeem een stuk touw van drie meter.\nAan de ene kant maak je een autootje vast, de andere kant bind je aan een potlood.\nRol je touw nu zo snel mogelijk op.\nWelk autootje wint de race?\nStop zoveel mogelijk letterkoekjes in je mond.\nJe mag niet knabbelen.\nSchrijf op elk blad van een rol wc-papier een andere meisjesnaam.\nBouw een kaartenhuisje van vier verdiepingen.\nBedenk een raadsel voor de leiding.\nBlaas een ballon op tot hij ontploft.\nVoeder je medespeler geblinddoekt een potje aardbeienyoghurt.\nBalanceer een bezemsteel gedurende tien seconden op je kin.\nVouw een vlieger en gooi hem verder dan de vlieger van de leiding.\nEet een boterham met choco op zonder je handen te gebruiken.\nRaad geblinddoekt welke voeten van welke tegenspelers zijn.\nMaak zo snel mogelijk een ballon kapot die in een boom hangt.\nVerzin een smurfennaam voor alle spelers uit je groep.\nKnoop geblinddoekt je schoenen dicht.\nJe medespeler gooit een aardappel.\nJij moet hem vangen met een vork.\nRangschik de namen van alle spelers in alfabetische volgorde.\nLaat een ijsblokje smelten zodat je de knikker eruit kan halen.\nEet om het eerst een bord gekookte rijst leeg met eetstokjes.\nVorm met je ploeg het woord ‘superformidabel’.\nMaak je schoen los.\nProbeer hem zo uit te schoppen dat hij op de tafel landt.\nJe moet op twee meter van de tafel staan.\nRijg zoveel mogelijk macaroni op een spaghettistokje.\nJe mag het spaghettistokje enkel met je mond aanraken.\nVerplaats een speelkaart naar de overkant van het speelterrein.\nDoe dat door ze met een rietje vast te zuigen, je mag ze niet aanraken.\nHoud drie ballonnen gedurende een minuut in de lucht zonder ze vast te houden.\nBlaas een zeepbel en zorg dat die door de hoepel zweeft die iemand van de leiding omhoog houdt.\nBlaas in één adem twintig verjaardagskaarsjes uit.\nGa met je medespelers in een kring zitten.\nSluit jullie ogen en probeer samen tot twintig te tellen door elk één nummer te zeggen.\nJullie mogen geen volgorde afspreken.\nSpreken twee spelers tegelijk, dan begin je opnieuw.\nScheer een ballon zonder dat hij springt.\nSchrijf je naam met je grote teen in verf gedoopt.\nMaak een klerenketting van vijftien meter.\nBekijk gedurende een halve minuut twintig voorwerpen.\nDaarna worden ze bedekt.\nSom er minstens vijftien op.\nJe mag een minuut lang niet met je ogen knipperen.\nAlle spelers van je groep doen hun schoenen uit en gooien die op een hoop.\nDaarna doe je een blinddoek om en draai je tien toertjes om je as.\nProbeer nu zo snel mogelijk je eigen schoenen opnieuw aan te doen.\nZoek vijf plaatsnamen waar een dier in voorkomt (Mol, Beveren, De Haan, Beersel, Beernem, Gierle, enz.).\nMaak een foto met een optische illusie (bv. raak de top van de kerktoren aan).\nOrganiseer een flashmob, zorg dat zoveel mogelijk mensen meedansen.\nMaak een regenboog na met sokken.\nRangschik je groep op aantal TikTok-volgers.\nVind de kookwekker voor hij afgaat.\nZorg dat je helemaal in het rood gekleed bent.\nTel hoeveel keer het woord ‘fee’ voorkomt in het sprookje over Doornroosje.\nLeer de leiding een spelletje dat ze nog niet kennen.\nOvertref de leiding in een uitdaging die je zelf mag kiezen.\nSchrijf een mooie boodschap op een kaartje voor de buren.\nKruip drie keer onder de tafel door.\nJe mag de grond niet raken.\nVorm met je ploeg een levend kunstwerk.\nKnip de coupons",
+      explanation: "Speluitleg\nEr wordt aan de spelers een lijst met allemaal verschillende opdrachten gegeven...",
       tags: {
         connectOrCreate: [
           { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
@@ -105,6 +322,219 @@ const main = async () => {
       }
     }
   })
+
+  // [Previous games remain the same...]
+
+  await prisma.game.create({
+    data: {
+      name: "Levend Memory",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        }
+      },
+      groups: true,
+      duration: 45,
+      explanation: "Spelers vormen paren en krijgen elk een actie toegewezen. Ze staan verspreid in het veld. Één speler moet, zoals bij memory, de juiste paren vinden door spelers aan te wijzen die hun actie moeten uitvoeren.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Geheugen" }, create: { tag: "Geheugen" } },
+          { where: { tag: "Beweging" }, create: { tag: "Beweging" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Vlaggenroof",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Zwaar"].id
+        }
+      },
+      groups: true,
+      duration: 60,
+      explanation: "Twee teams hebben elk een vlag in hun gebied. Het doel is om de vlag van het andere team te stelen en naar je eigen gebied te brengen, terwijl je je eigen vlag beschermt. Als je wordt getikt in het gebied van de tegenstander, ga je naar de gevangenis.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Strategie" }, create: { tag: "Strategie" } },
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Renspel" }, create: { tag: "Renspel" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Levend Stratego",
+      user: {
+        connect: {
+          id: guest.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Zwaar"].id
+        }
+      },
+      groups: true,
+      duration: 90,
+      explanation: "Gebaseerd op het bordspel Stratego. Spelers krijgen rangen toegewezen en proberen de vlag van het andere team te vinden. Bij ontmoetingen tonen spelers hun rang, de laagste rang verliest.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Strategie" }, create: { tag: "Strategie" } },
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Waterstafette",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        }
+      },
+      groups: true,
+      duration: 30,
+      explanation: "Teams moeten water van punt A naar punt B transporteren met behulp van verschillende voorwerpen (bekertjes, sponzen, etc.). Het team dat het meeste water verzamelt, wint.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Water" }, create: { tag: "Water" } },
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } },
+          { where: { tag: "Zomer" }, create: { tag: "Zomer" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Ninja",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        }
+      },
+      groups: true,
+      duration: 20,
+      explanation: "Spelers staan in een cirkel en maken om de beurt één beweging om de handen van andere spelers te raken. Als je hand geraakt wordt, verlies je die hand. Verlies je beide handen, dan ben je af.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Reactievermogen" }, create: { tag: "Reactievermogen" } },
+          { where: { tag: "Behendigheid" }, create: { tag: "Behendigheid" } },
+          { where: { tag: "Simpel" }, create: { tag: "Simpel" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Weerwolven",
+      user: {
+        connect: {
+          id: guest.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Rustig"].id
+        }
+      },
+      groups: true,
+      duration: 45,
+      explanation: "Een rollenspel waarbij spelers dorpelingen of weerwolven zijn. 's Nachts eten weerwolven een dorpeling, overdag stemmen dorpelingen wie ze verdenken. Het spel gaat door tot alle weerwolven of dorpelingen zijn uitgeschakeld.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Strategie" }, create: { tag: "Strategie" } },
+          { where: { tag: "Rollenspel" }, create: { tag: "Rollenspel" } },
+          { where: { tag: "Binnen" }, create: { tag: "Binnen" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Levend Pac-Man",
+      user: {
+        connect: {
+          id: admin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Zwaar"].id
+        }
+      },
+      groups: true,
+      duration: 40,
+      explanation: "Een speler is Pac-Man, anderen zijn spoken of punten. Pac-Man moet alle punten verzamelen terwijl hij de spoken ontwijkt. Power-ups maken spoken tijdelijk kwetsbaar.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Renspel" }, create: { tag: "Renspel" } },
+          { where: { tag: "Beweging" }, create: { tag: "Beweging" } },
+          { where: { tag: "Buiten" }, create: { tag: "Buiten" } }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.create({
+    data: {
+      name: "Hints Estafette",
+      user: {
+        connect: {
+          id: superadmin.id
+        }
+      },
+      intensity: {
+        connect: {
+          id: intensityMap["Matig"].id
+        }
+      },
+      groups: true,
+      duration: 35,
+      explanation: "Teams staan in rijen. De eerste speler krijgt een woord te zien en moet dit uitbeelden aan de tweede speler, die het weer doorgeeft aan de derde, enzovoort. Het laatste teamlid moet het juiste woord raden.",
+      tags: {
+        connectOrCreate: [
+          { where: { tag: "Teamspel" }, create: { tag: "Teamspel" } },
+          { where: { tag: "Communicatie" }, create: { tag: "Communicatie" } },
+          { where: { tag: "Creatief" }, create: { tag: "Creatief" } }
+        ]
+      }
+    }
+  })
+
 };
 
 (async () => {

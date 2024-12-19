@@ -30,7 +30,7 @@ const Home = () => {
     const response = await gameService.getGamesRandom()
     const games: Game[] = await response.json();
 
-    return games;
+    return games.slice(0, 6);
   }
 
   const {
