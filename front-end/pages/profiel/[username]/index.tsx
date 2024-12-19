@@ -5,6 +5,7 @@ import Loader from '@/components/Loader';
 import ErrorAlert from '@/components/ErrorAlert';
 import { useRouter } from 'next/router';
 import userService from '@/services/UserService';
+import gameService from '@/services/GameService';
 import Navbar from '@/components/Navbar';
 import UserProfile from '@/components/profile/User';
 import GameGrid from '@/components/game/Grid';
@@ -40,13 +41,24 @@ const Update = () => {
   };
 
 
-  const fetchData = async () => {
+  const fetchProfile = async () => {
     try {
       const response = await userService.getUserByUsername(username as string);
       const result: User = await response.json();
       setUser(result);
     } catch (error) {
       setApiError('Er is een fout opgetreden bij het laden van de gegevens');
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await gameService.getGamesByUsername(username as string);
+      const result: Game[] = await response.json();
+      if (result.length > 0)
+        setGames(result.slice(0, 6));
+    } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
@@ -56,6 +68,7 @@ const Update = () => {
   useEffect(() => {
     const effect = async () => {
       await checkAuth();
+      await fetchProfile();
       await fetchData();
     };
 

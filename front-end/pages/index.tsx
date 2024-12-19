@@ -38,7 +38,7 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const response = await gameService.getGames();
+      const response = await gameService.getGamesRandom();
       const result: Game[] = await response.json();
       if (result.length > 0)
         setGames(result.slice(0, 6));

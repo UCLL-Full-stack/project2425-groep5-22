@@ -4,12 +4,9 @@ import {
   User as UserPrisma,
   Intensity as IntensityPrisma,
   Tag as TagPrisma,
-  Media as MediaPrisma,
 } from "@prisma/client"
 import { User } from "./user";
 import { Tag } from "./tag";
-import { Media } from "./media";
-
 export class Game {
   private id?: number;
   private user: User;
@@ -19,7 +16,6 @@ export class Game {
   private duration: number;
   private explanation: string;
   private tags: Tag[];
-  private medias: Media[];
   private createdAt?: Date;
   private updatedAt?: Date | null;
 
@@ -32,7 +28,6 @@ export class Game {
     duration: number;
     explanation: string;
     tags: Tag[];
-    medias?: Media[]
     createdAt?: Date;
     updatedAt?: Date | null
   }) {
@@ -46,7 +41,6 @@ export class Game {
     this.duration = game.duration
     this.explanation = game.explanation;
     this.tags = game.tags;
-    this.medias = game.medias ?? [];
     this.createdAt = game.createdAt;
     this.updatedAt = game.updatedAt;
   }
@@ -71,6 +65,8 @@ export class Game {
       throw new Error('Groups is required.');
     if (!game.duration)
       throw new Error('Duration is required.');
+    if (game.duration <= 0)
+      throw new Error('Duration must me greater than 0.');
     if (!game.explanation && game.name !== "")
       throw new Error('Explanation is required.');
     if (!game.tags)
@@ -85,7 +81,6 @@ export class Game {
     explanation,
     user,
     tags,
-    medias,
     intensity,
     createdAt,
     updatedAt
@@ -93,7 +88,6 @@ export class Game {
     user: UserPrisma,
     tags: TagPrisma[],
     intensity: IntensityPrisma,
-    medias: MediaPrisma[]
   }): Game {
     return new Game({
       id,
@@ -103,7 +97,6 @@ export class Game {
       duration,
       explanation,
       tags: tags.map((tag) => Tag.from(tag)),
-      medias: medias.map((media) => Media.from(media)),
       intensity: Intensity.from(intensity),
       createdAt,
       updatedAt
@@ -142,16 +135,42 @@ export class Game {
     return this.tags;
   }
 
-  getMedias(): Media[] {
-    return this.medias;
-  }
-
   getCreatedAt(): Date | undefined {
     return this.createdAt;
   }
 
   getUpdatedAt(): Date | null | undefined {
     return this.updatedAt;
+  }
+
+  setIntensity(intensity: Intensity): this {
+    this.intensity = intensity;
+    return this;
+  }
+
+  setName(name: string): this {
+    this.name = name;
+    return this;
+  }
+
+  setGroups(groups: boolean): this {
+    this.groups = groups;
+    return this;
+  }
+
+  setDuration(duration: number): this {
+    this.duration = duration;
+    return this;
+  }
+
+  setExplanation(explanation: string): this {
+    this.explanation = explanation;
+    return this;
+  }
+
+  setTags(tags: Tag[]): this {
+    this.tags = tags;
+    return this;
   }
 
   equals(game: Game): boolean {
@@ -163,7 +182,6 @@ export class Game {
       this.duration === game.getDuration() &&
       this.explanation === game.getExplanation() &&
       this.tags.every((tag, index) => tag.equals(game.getTags()[index])) &&
-      this.medias.every((media, index) => media.equals(game.getMedias()[index])) &&
       this.createdAt === game.getCreatedAt() &&
       this.updatedAt === game.getUpdatedAt()
     );

@@ -1,8 +1,39 @@
-import { Game } from "@/types";
+import { Filter, Game } from "@/types";
 import userService from "./UserService";
 
 const getGames = async () => {
   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + userService.getUser()?.token
+    },
+  });
+}
+
+const getFilteredGames = async (filters: Filter) => {
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/filter`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + userService.getUser()?.token
+    },
+    body: JSON.stringify(filters),
+  });
+}
+
+const getGamesRandom = async () => {
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/random`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + userService.getUser()?.token
+    },
+  });
+}
+
+const getGamesByUsername = async (username: string) => {
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/username/${username}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -43,21 +74,23 @@ const updateGame = async (id: string, game: Game) => {
   });
 }
 
-const deleteGame = async (id: string, game: Game) => {
+const deleteGame = async (id: string) => {
   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + userService.getUser()?.token
     },
-    body: JSON.stringify(game),
   });
 }
 
 export default {
   getGames,
+  getFilteredGames,
+  getGamesRandom,
   createGame,
   getGameById,
   updateGame,
-  deleteGame
+  deleteGame,
+  getGamesByUsername
 }

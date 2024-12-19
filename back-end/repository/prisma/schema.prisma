@@ -48,16 +48,4 @@ model Game {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   tags        Tag[]
-  medias      Media[]
-}
-
-model Media {
-  id        Int      @id @default(autoincrement())
-  name      String
-  file      String
-  filetype  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  gameId    Int
-  Game      Game     @relation(fields: [gameId], references: [id])
 }

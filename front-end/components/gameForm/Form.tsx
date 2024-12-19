@@ -3,6 +3,7 @@ import { Game, Intensity, Tag, User } from '@/types';
 import FormField from '@/components/gameForm/FormField';
 import TagInput from '@/components/gameForm/TagInput';
 import Button from '@/components/Button';
+import { useRouter } from 'next/router';
 
 interface Props {
   initialGame?: Partial<Game>;
@@ -19,6 +20,7 @@ const Form: React.FC<Props> = ({
   onSubmit,
   submitButtonText = 'Opslaan'
 }) => {
+  const router = useRouter();
   const [game, setGame] = useState<Game>({
     name: initialGame.name || '',
     user: initialGame.user || {} as User,
@@ -26,7 +28,7 @@ const Form: React.FC<Props> = ({
     duration: initialGame.duration || 0,
     groups: initialGame.groups ?? true,
     intensity: initialGame.intensity || {} as Intensity,
-    tags: initialGame.tags || []
+    tags: initialGame.tags?.map((tag) => typeof tag === 'string' ? tag : tag.tag) || []
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({});
@@ -78,13 +80,14 @@ const Form: React.FC<Props> = ({
   const handleTagRemove = (tagToRemove: string) => {
     setGame(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag === tagToRemove)
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
     }));
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end w-full">
+      <div className="flex items-center justify-between w-full">
+        <Button className="bg-transparent hover:bg-gray-200 text-black" onClick={() => router.back()}>Terug</Button>
         <Button onClick={handleSubmit} loading={isSubmitting}>{submitButtonText}</Button>
       </div>
 
@@ -177,6 +180,7 @@ const Form: React.FC<Props> = ({
                 onTagSelect={handleTagSelect}
                 onTagRemove={handleTagRemove}
                 error={errors.tags}
+                canCreateNewTag={true}
               />
             </FormField>
           </div>

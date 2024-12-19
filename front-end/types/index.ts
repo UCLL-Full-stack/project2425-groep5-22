@@ -49,3 +49,10 @@ export type AuthStatus = {
   status: boolean,
   user?: User
 }
+
+export type Filter = {
+  tags: string[],
+  intensityId: number | null,
+  groups: boolean | null,
+  duration: number | null,
+}

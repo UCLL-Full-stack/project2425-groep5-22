@@ -1,0 +1,36 @@
+{
+  "login": {
+    "title": "Login",
+    "noAccount": "Don't have an account?",
+    "registerHere": "Register here.",
+    "errorMessages": {
+      "authenticationError": "Something went wrong while checking authentication, please try again later",
+      "loginError": "An error occurred, please try again later",
+      "incorrectCredentials": "Email and/or password is incorrect"
+    },
+    "form": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "loginButton": "Log In"
+    },
+    "metadata": {
+      "pageTitle": "Login",
+      "pageDescription": "Sign in to Jeugdwerk"
+    },
+    "userManagement": {
+      "showUsers": "Show Users",
+      "hideUsers": "Hide Users",
+      "tableHeaders": {
+        "username": "Username",
+        "email": "Email",
+        "password": "Password",
+        "role": "Role"
+      },
+      "roles": {
+        "superadmin": "Super Admin",
+        "admin": "Admin",
+        "guest": "Guest"
+      }
+    }
+  }
+}

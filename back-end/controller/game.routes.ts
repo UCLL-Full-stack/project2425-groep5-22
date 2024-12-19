@@ -141,6 +141,76 @@ gameRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
 /**
  * @swagger
+ * /games/random:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get a random list of games
+ *     responses:
+ *       200:
+ *         description: An array of game objects in random order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ */
+gameRouter.get('/random', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const games = await gameService.getGamesRandom();
+    res.status(200).json(games);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /games/filter:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get a list of games filtered by criteria
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               intensityId:
+ *                 type: number
+ *               groups:
+ *                 type: boolean
+ *               duration:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: An array of filtered game objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ */
+gameRouter.post('/filter', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const filters = req.body;
+    const games = await gameService.getFilteredGames(filters);
+    res.status(200).json(games);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
  * /games/{id}:
  *   get:
  *     security:
@@ -178,6 +248,43 @@ gameRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) =
 
 /**
  * @swagger
+ * /games/username/{username}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get games by user username
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The username of the user whose games you want to retrieve.
+ *     responses:
+ *       200:
+ *         description: The list of games associated with the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ */
+gameRouter.get('/username/:username', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
+
+    const games = await gameService.getUserGames(request.params.username);
+    res.status(200).json(games);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+/**
+ * @swagger
  * /games:
  *   post:
  *     security:
@@ -208,5 +315,74 @@ gameRouter.post('/', async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 });
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Update a game
+ *     parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *              required: true
+ *              description: The game id.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/GameInput'
+ *     responses:
+ *       200:
+ *         description: The updated game
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Game'
+ */
+gameRouter.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
+    const gameInput = <GameInput>req.body;
+    const response = await gameService.updateGame({ ...gameInput, gameId: Number(request.params.id), email, role });
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Delete a game
+ *     parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *              required: true
+ *              description: The game id.
+ *     responses:
+ *       204
+ */
+gameRouter.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const request = req as Request & { auth: { email: string; role: Role } };
+    const { email, role } = request.auth;
+    await gameService.deleteGame({ gameId: Number(request.params.id), email, role });
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 export { gameRouter };

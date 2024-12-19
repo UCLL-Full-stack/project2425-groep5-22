@@ -26,7 +26,7 @@ const getTagById = async ({ id }: { id: number }): Promise<Tag | null> => {
 const getTagByTag = async ({ tag }: { tag: string }): Promise<Tag | null> => {
   try {
     const result = await database.tag.findUnique({
-      where: { tag: tag },
+      where: { tag },
     });
     return result ? Tag.from(result) : null;
   } catch (e) {
@@ -49,9 +49,25 @@ const createTag = async ({ tag }: { tag: Tag }): Promise<Tag> => {
   }
 };
 
+const cleanUpTags = async (): Promise<void> => {
+  try {
+    await database.tag.deleteMany({
+      where: {
+        Games: {
+          none: {},
+        },
+      },
+    })
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Failed to create tag, see server logs for more details.');
+  }
+}
+
 export default {
   getAllTags,
   getTagById,
   getTagByTag,
   createTag,
+  cleanUpTags
 };

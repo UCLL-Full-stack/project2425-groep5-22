@@ -1,0 +1,36 @@
+{
+  "login": {
+    "title": "Login",
+    "noAccount": "Nog geen account?",
+    "registerHere": "Registreer hier.",
+    "errorMessages": {
+      "authenticationError": "Er ging iets mis met authenticatie te controlleren, probeer het later opnieuw",
+      "loginError": "Er is iets misgelopen, probeer later opnieuw",
+      "incorrectCredentials": "Email en/of wachtwoord is incorrect"
+    },
+    "form": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Wachtwoord",
+      "loginButton": "Inloggen"
+    },
+    "metadata": {
+      "pageTitle": "Inloggen",
+      "pageDescription": "Meld je aan op Jeugdwerk"
+    },
+    "userManagement": {
+      "showUsers": "Gebruikers tonen",
+      "hideUsers": "Gebruikers verbergen",
+      "tableHeaders": {
+        "username": "Username",
+        "email": "Email",
+        "password": "Password",
+        "role": "Role"
+      },
+      "roles": {
+        "superadmin": "Superadmin",
+        "admin": "Admin",
+        "guest": "Gast"
+      }
+    }
+  }
+}

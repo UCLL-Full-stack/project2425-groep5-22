@@ -8,7 +8,6 @@ const getAllGames = async (): Promise<Game[]> => {
         user: true,
         intensity: true,
         tags: true,
-        medias: true,
       },
     });
     return result.map((game) =>
@@ -17,7 +16,88 @@ const getAllGames = async (): Promise<Game[]> => {
         user: game.user,
         intensity: game.intensity,
         tags: game.tags,
-        medias: game.medias,
+      })
+    );
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
+};
+
+const getFilteredGames = async (filters: {
+  tags?: string[];
+  intensityId?: number;
+  groups?: boolean;
+  durationRange?: { gte: number; lte: number };
+}): Promise<Game[]> => {
+  try {
+    // Build the `where` condition object dynamically
+    const whereConditions: any = {};
+
+    if (filters.tags && filters.tags.length > 0) {
+      whereConditions.tags = { some: { tag: { in: filters.tags } } };
+    }
+
+    if (filters.intensityId && filters.intensityId !== null) {
+      whereConditions.intensityId = filters.intensityId;
+    }
+
+    if (filters.groups !== undefined && filters.groups !== null) {
+      whereConditions.groups = filters.groups;
+    }
+
+    if (filters.durationRange) {
+      whereConditions.duration = {
+        gte: filters.durationRange.gte,
+        lte: filters.durationRange.lte,
+      };
+    }
+
+    const result = await database.game.findMany({
+      where: whereConditions,
+      include: {
+        user: true,
+        intensity: true,
+        tags: true,
+      },
+    });
+
+    // Map result to Game model
+    return result.map((game) =>
+      Game.from({
+        ...game,
+        user: game.user,
+        intensity: game.intensity,
+        tags: game.tags,
+      })
+    );
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Database Error, see server logs for more details.');
+  }
+};
+
+export const getGamesByUser = async ({ username }: { username: string }) => {
+  try {
+    const result = await database.game.findMany({
+      where: {
+        user: {
+          username: username
+        }
+      },
+      include: {
+        user: true,
+        intensity: true,
+        tags: true,
+      },
+    });
+
+    return result.map((game) =>
+      Game.from({
+        ...game,
+        user: game.user,
+        intensity: game.intensity,
+        tags: game.tags,
       })
     );
   } catch (e) {
@@ -34,7 +114,6 @@ const getGameById = async ({ id }: { id: number }): Promise<Game | null> => {
         user: true,
         intensity: true,
         tags: true,
-        medias: true,
       },
     });
     return result ? Game.from({
@@ -42,7 +121,6 @@ const getGameById = async ({ id }: { id: number }): Promise<Game | null> => {
       user: result.user,
       intensity: result.intensity,
       tags: result.tags,
-      medias: result.medias,
     }) : null;
   } catch (e) {
     console.error('Database Error', e);
@@ -71,19 +149,11 @@ const createGame = async ({ game }: { game: Game }): Promise<Game> => {
         tags: {
           connect: game.getTags().map((tag) => ({ id: tag.getId() })),
         },
-        medias: {
-          create: game.getMedias().map((media) => ({
-            name: media.getName(),
-            file: media.getFile(),
-            filetype: media.getFiletype(),
-          })),
-        },
       },
       include: {
         user: true,
         intensity: true,
         tags: true,
-        medias: true,
       },
     });
 
@@ -92,7 +162,6 @@ const createGame = async ({ game }: { game: Game }): Promise<Game> => {
       user: result.user,
       intensity: result.intensity,
       tags: result.tags,
-      medias: result.medias,
     });
   } catch (e) {
     console.error('Database Error', e);
@@ -100,8 +169,72 @@ const createGame = async ({ game }: { game: Game }): Promise<Game> => {
   }
 };
 
+const updateGame = async ({ game }: { game: Game }): Promise<Game> => {
+  try {
+    // Update the game data in the database
+    const result = await database.game.update({
+      where: {
+        id: game.getId(),
+      },
+      data: {
+        user: {
+          connect: {
+            id: game.getUser().getId(),
+          },
+        },
+        intensity: {
+          connect: {
+            id: game.getIntensity().getId(),
+          },
+        },
+        name: game.getName(),
+        groups: game.getGroups(),
+        duration: game.getDuration(),
+        explanation: game.getExplanation(),
+        tags: {
+          set: [], // Clear existing tags
+          connect: game.getTags().map((tag) => ({ id: tag.getId() })), // Add new tags
+        }
+      },
+      include: {
+        user: true,
+        intensity: true,
+        tags: true,
+      },
+    });
+
+    return Game.from({
+      ...result,
+      user: result.user,
+      intensity: result.intensity,
+      tags: result.tags,
+    });
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Failed to update game, see server logs for more details.');
+  }
+};
+
+const deleteGame = async ({ id }: { id: number }): Promise<void> => {
+  try {
+    await database.game.delete({
+      where: {
+        id: id,
+      },
+    });
+  } catch (e) {
+    console.error('Database Error', e);
+    throw new Error('Failed to delete game, see server logs for more details.');
+  }
+};
+
+
 export default {
   getAllGames,
   getGameById,
   createGame,
+  updateGame,
+  deleteGame,
+  getFilteredGames,
+  getGamesByUser
 };

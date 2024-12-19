@@ -23,10 +23,10 @@ const Navbar: React.FC<Props> = ({ user }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (animation)
-      sessionStorage.setItem('animation', animation.toString());
-  }, [animation]);
+  const changeAnimation = async (state: boolean) => {
+    await sessionStorage.setItem('animation', state.toString());
+    setAnimation(state);
+  }
 
   const handleLogout = () => {
     console.log("Logging out...");
@@ -54,6 +54,9 @@ const Navbar: React.FC<Props> = ({ user }) => {
 
               {/* Navigation Links */}
               <div className="hidden sm:flex sm:items-center sm:space-x-6">
+                <Link href={'/'} className="px-3 py-2 text-sm font-semibold transition-all rounded-md hover:bg-gray-200">
+                  Startpagina
+                </Link>
                 <Link href={'/spelletjes'} className="px-3 py-2 text-sm font-semibold transition-all rounded-md hover:bg-gray-200">
                   Spelletjes
                 </Link>
@@ -65,8 +68,8 @@ const Navbar: React.FC<Props> = ({ user }) => {
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={animation ?? false}
-                  onChange={() => setAnimation(!animation)}
+                  defaultChecked={animation ?? false}
+                  onChange={() => changeAnimation(!animation)}
                   className="sr-only"
                 />
                 <div className="w-12 h-6 transition-colors duration-300 ease-in-out bg-gray-200 rounded-full">
@@ -144,6 +147,12 @@ const Navbar: React.FC<Props> = ({ user }) => {
         {open && (
           <div className="sm:hidden">
             <div className="pt-2 pb-3 space-y-1 text-center">
+              <Link
+                href="/"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
+              >
+                Startpagina
+              </Link>
               <Link
                 href="/spelletjes"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"

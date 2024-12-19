@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Tag } from '@/types';
+import { X } from 'lucide-react';
 
 type Props = {
-  availableTags: Tag[],
-  selectedTags: (Tag | string)[],
-  onTagSelect: Function,
-  onTagRemove: Function,
-  error: string | undefined
-}
+  availableTags: Tag[];
+  selectedTags: (Tag | string)[];
+  onTagSelect: Function;
+  onTagRemove: Function;
+  error: string | undefined;
+  canCreateNewTag: boolean;
+};
 
 const TagInput: React.FC<Props> = ({
   availableTags,
   selectedTags,
   onTagSelect,
   onTagRemove,
-  error
+  error,
+  canCreateNewTag,
 }) => {
   const [tagInput, setTagInput] = useState<string>('');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -70,7 +73,7 @@ const TagInput: React.FC<Props> = ({
                 {tag.tag}
               </div>
             ))}
-            {tagInput && !filteredTags.find(tag => tag.tag.toLowerCase() === tagInput.toLowerCase()) && (
+            {tagInput && !filteredTags.find(tag => tag.tag.toLowerCase() === tagInput.toLowerCase()) && canCreateNewTag && (
               <div
                 onClick={handleCreateTag}
                 className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-primary"
@@ -90,10 +93,10 @@ const TagInput: React.FC<Props> = ({
           >
             {typeof tag === 'string' ? tag : tag.tag} {/* Use tag or tag.tag based on type */}
             <button
-              onClick={() => onTagRemove(tag)}
-              className="rounded-full hover:bg-primary/30 transition-all px-2 py-0.5"
+              onClick={() => onTagRemove(typeof tag === 'string' ? tag : tag.tag)}
+              className="rounded-full hover:bg-primary/30 transition-all p-0.5"
             >
-              X
+              <X className='w-4 h-4' />
             </button>
           </div>
         ))}

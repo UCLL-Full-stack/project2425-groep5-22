@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 
 const UserManagementTable: React.FC = () => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState<boolean>(true);
 
   const users = [
@@ -26,9 +28,9 @@ const UserManagementTable: React.FC = () => {
 
   const getRoleStyles = (role: string) => {
     switch (role) {
-      case 'Superadmin':
+      case t('Superadmin'):
         return 'bg-red-100 text-red-800';
-      case 'Admin':
+      case t('Admin'):
         return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-green-100 text-green-800';
@@ -38,18 +40,25 @@ const UserManagementTable: React.FC = () => {
   if (!visible) {
     return (
       <div className="flex items-center justify-center">
-        <button onClick={() => setVisible(true)} className='text-sm underline hover:text-primary'>Gebruikers tonen</button>
+        <button onClick={() => setVisible(true)} className='text-sm underline hover:text-primary'>
+          {t('login.userManagement.showUsers')}
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-4xl p-6 mx-auto bg-gray-50">
-      <div className="overflow-hidden bg-white rounded-lg shadow-md">
+    <div className="w-full max-w-4xl p-6 mx-auto bg-gray-100">
+      <div className="overflow-hidden rounded-lg shadow-md">
         <table className="w-full">
-          <thead className="bg-gray-200">
+          <thead className="bg-white">
             <tr>
-              {['Username', 'Email', 'Password', 'Role'].map((header) => (
+              {[
+                t('login.userManagement.tableHeaders.username'),
+                t('login.userManagement.tableHeaders.email'),
+                t('login.userManagement.tableHeaders.password'),
+                t('login.userManagement.tableHeaders.role')
+              ].map((header) => (
                 <th
                   key={header}
                   className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase"
@@ -59,7 +68,7 @@ const UserManagementTable: React.FC = () => {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-300">
             {users.map((user, index) => (
               <tr
                 key={index}
@@ -88,7 +97,9 @@ const UserManagementTable: React.FC = () => {
         </table>
       </div>
       <div className="flex items-center justify-center">
-        <button onClick={() => setVisible(false)} className='text-sm underline hover:text-primary'>Gebruikers verbergen</button>
+        <button onClick={() => setVisible(false)} className='text-sm underline hover:text-primary'>
+          {t('login.userManagement.hideUsers')}
+        </button>
       </div>
     </div>
   );

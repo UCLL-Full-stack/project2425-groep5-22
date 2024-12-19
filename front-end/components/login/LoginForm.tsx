@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import Button from "../Button";
 import userService from "@/services/UserService";
 import { User } from "@/types";
+import { useTranslation } from 'next-i18next';
 
 const LoginForm: React.FC = () => {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState<User>({
@@ -23,9 +25,9 @@ const LoginForm: React.FC = () => {
 
       if (!response.ok) {
         if (result.message === "Username or password is incorrect.") {
-          setError("Email en/of wachtwoord is incorrect");
+          setError(t('login.errorMessages.incorrectCredentials'));
         } else {
-          setError("Er is iets misgelopen, probeer later opnieuw");
+          setError(t('login.errorMessages.loginError'));
         }
         return;
       }
@@ -33,7 +35,7 @@ const LoginForm: React.FC = () => {
       sessionStorage.setItem("loggedInUser", JSON.stringify(result));
       router.push("/");
     } catch (error) {
-      setError("Er is iets misgelopen, probeer later opnieuw");
+      setError(t('login.errorMessages.loginError'));
     } finally {
       setLoading(false);
     }
@@ -55,7 +57,7 @@ const LoginForm: React.FC = () => {
           }))
         }
         name="email"
-        placeholder="Email"
+        placeholder={t('login.form.emailPlaceholder')}
         required={true}
       />
       <input
@@ -69,10 +71,10 @@ const LoginForm: React.FC = () => {
           }))
         }
         name="password"
-        placeholder="Wachtwoord"
+        placeholder={t('login.form.passwordPlaceholder')}
         required={true}
       />
-      <Button loading={loading} className="w-full">Inloggen</Button>
+      <Button loading={loading} className="w-full">{t('login.form.loginButton')}</Button>
     </form>
   );
 };
