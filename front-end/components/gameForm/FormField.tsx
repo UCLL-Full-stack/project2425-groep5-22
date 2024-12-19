@@ -3,7 +3,7 @@ import React from 'react';
 type Props = {
   label?: string,
   error?: string,
-  children: JSX.Element,
+  children: any,
   className?: string
 }
 

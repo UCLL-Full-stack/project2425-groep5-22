@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 type Props = {
   children: ReactNode,
-  onClick?: () => any, // onClick is optional
+  onClick?: () => any,
   loading?: boolean,
   className?: string
 }
@@ -14,7 +14,7 @@ const Button: React.FC<Props> = ({
   className
 }) => {
   return (
-    <button
+    <button data-testid="click-me"
       onClick={onClick ? () => onClick() : undefined}
       disabled={loading}
       className={`button ${loading
