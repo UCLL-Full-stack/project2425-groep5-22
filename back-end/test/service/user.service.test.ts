@@ -40,3 +40,106 @@ test('given: invalid credentials, when: authenticate is called, then: error is t
     password: 'wrongpass'
   } as UserInput)).rejects.toThrow('Username or password is incorrect.');
 });
+
+test('given: valid user data, when: createUser is called, then: user is created successfully', async () => {
+  // Given
+  const userInput = {
+    username: 'johndoe',
+    email: 'john@jeugdwerk.org',
+    password: 'password123',
+    role: 'guest' as const
+  };
+
+  jest.spyOn(userDb, 'getUserByEmail').mockResolvedValue(null);
+  jest.spyOn(userDb, 'getUserByUsername').mockResolvedValue(null);
+  jest.spyOn(userDb, 'createUser').mockImplementation(async (user) => {
+    return new User({
+      id: 1,
+      ...userInput,
+      password: user.getPassword() // This will be the hashed password
+    });
+  });
+
+  // When
+  const result = await userService.createUser(userInput);
+
+  // Then
+  expect(result.getUsername()).toBe(userInput.username);
+  expect(result.getEmail()).toBe(userInput.email);
+  expect(result.getRole()).toBe(userInput.role);
+  expect(result.getPassword()).not.toBe(userInput.password); // Password should be hashed
+  expect(userDb.createUser).toHaveBeenCalled();
+});
+
+test('given: username with space, when: createUser is called, then: error is thrown', async () => {
+  // Given
+  const userInput = {
+    username: 'john doe',
+    email: 'john@jeugdwerk.org',
+    password: 'password123',
+    role: 'guest' as const
+  };
+
+  // When/Then
+  await expect(userService.createUser(userInput))
+    .rejects.toThrow("Username can't include spaces and special characters.");
+});
+
+test('given: username with special characters, when: createUser is called, then: error is thrown', async () => {
+  // Given
+  const userInput = {
+    username: 'john@doe',
+    email: 'john@jeugdwerk.org',
+    password: 'password123',
+    role: 'guest' as const
+  };
+
+  // When/Then
+  await expect(userService.createUser(userInput))
+    .rejects.toThrow("Username can't include spaces and special characters.");
+});
+
+test('given: existing email, when: createUser is called, then: error is thrown', async () => {
+  // Given
+  const userInput = {
+    username: 'johndoe',
+    email: 'existing@jeugdwerk.org',
+    password: 'password123',
+    role: 'guest' as const
+  };
+
+  jest.spyOn(userDb, 'getUserByEmail').mockResolvedValue(new User({
+    id: 1,
+    username: 'existinguser',
+    email: 'existing@jeugdwerk.org',
+    password: 'hashedpassword',
+    role: 'guest'
+  }));
+
+  // When/Then
+  await expect(userService.createUser(userInput))
+    .rejects.toThrow('User with username johndoe already exists.');
+});
+
+test('given: existing username, when: createUser is called, then: error is thrown', async () => {
+  // Given
+  const userInput = {
+    username: 'existinguser',
+    email: 'john@jeugdwerk.org',
+    password: 'password123',
+    role: 'guest' as const
+  };
+
+  jest.spyOn(userDb, 'getUserByEmail').mockResolvedValue(null);
+  jest.spyOn(userDb, 'getUserByUsername').mockResolvedValue(new User({
+    id: 1,
+    username: 'existinguser',
+    email: 'existing@jeugdwerk.org',
+    password: 'hashedpassword',
+    role: 'guest'
+  }));
+
+  // When/Then
+  await expect(userService.createUser(userInput))
+    .rejects.toThrow('User with username existinguser already exists.');
+});

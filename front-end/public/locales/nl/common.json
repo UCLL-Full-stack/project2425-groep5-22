@@ -32,5 +32,31 @@
         "guest": "Gast"
       }
     }
+  },
+  "signup": {
+    "metadata": {
+      "pageTitle": "Registreren - Game Activiteiten Platform",
+      "pageDescription": "Maak een nieuw account aan voor het Game Activiteiten Platform"
+    },
+    "title": "Account Aanmaken",
+    "form": {
+      "usernamePlaceholder": "Gebruikersnaam",
+      "emailPlaceholder": "E-mailadres",
+      "passwordPlaceholder": "Wachtwoord",
+      "signupButton": "Registreren",
+      "validation": {
+        "usernameRequired": "Gebruikersnaam is verplicht",
+        "usernameInvalid": "Gebruikersnaam mag geen spatie of speciale tekens bevatten",
+        "emailRequired": "E-mail is verplicht",
+        "passwordRequired": "Wachtwoord is verplicht"
+      }
+    },
+    "errorMessages": {
+      "userExists": "Gebruiker met dit e-mailadres of gebruikersnaam bestaat al",
+      "signupError": "Er is iets misgegaan tijdens het registreren. Probeer het opnieuw.",
+      "invalidUsername": "Gebruikersnaam mag alleen letters, cijfers, underscore en koppelteken bevatten"
+    },
+    "haveAccount": "Heb je al een account?",
+    "loginHere": "Log hier in"
   }
 }

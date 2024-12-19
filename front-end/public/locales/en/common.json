@@ -32,5 +32,31 @@
         "guest": "Guest"
       }
     }
+  },
+  "signup": {
+    "metadata": {
+      "pageTitle": "Sign up - Game Activities Platform",
+      "pageDescription": "Create a new account for the Game Activities Platform"
+    },
+    "title": "Create Account",
+    "form": {
+      "usernamePlaceholder": "Username",
+      "emailPlaceholder": "Email address",
+      "passwordPlaceholder": "Password",
+      "signupButton": "Sign up",
+      "validation": {
+        "usernameRequired": "Username is required",
+        "usernameInvalid": "Username can only contain letters, numbers, underscore and hyphen",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "errorMessages": {
+      "userExists": "User with this email or username already exists",
+      "signupError": "Something went wrong during signup. Please try again.",
+      "invalidUsername": "Username can only contain letters, numbers, underscore and hyphen"
+    },
+    "haveAccount": "Already have an account?",
+    "loginHere": "Login here"
   }
 }

@@ -37,6 +37,10 @@ const createUser = async ({
   password,
   role
 }: UserInput): Promise<User> => {
+  if (username.includes(" ") || /[^a-zA-Z0-9_-]/.test(username)) {
+    throw new Error("Username can't include spaces and special characters.");
+  }
+
   const existingUserByEmail: User | null = await userDB.getUserByEmail({ email });
   if (existingUserByEmail) {
     throw new Error('User with username ' + username + ' already exists.');

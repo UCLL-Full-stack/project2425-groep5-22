@@ -35,6 +35,16 @@ const getUser = (): AuthenticationResponse | null => {
     })();
 }
 
+const createUser = async (user: User) => {
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/signup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    });
+}
+
 const checkAuth = async (): Promise<AuthStatus> => {
     const authenticationResponse: AuthenticationResponse | null = getUser();
     if (!authenticationResponse) return { status: false };
@@ -54,5 +64,6 @@ export default {
     loginUser,
     getUserByUsername,
     checkAuth,
-    getUser
+    getUser,
+    createUser
 };
