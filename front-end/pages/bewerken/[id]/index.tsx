@@ -189,7 +189,9 @@ const Update = () => {
         )}
 
         {data && (
-          <>
+          currentUser.id !== data.game.user.id ? (
+            <NotFound statusCode={403} withDarkMode={false} title="Je hebt geen rechten om dit spel te bewerken." />
+          ) : (<>
             {apiError && (
               <Alert
                 message={apiError}
@@ -205,8 +207,9 @@ const Update = () => {
               submitButtonText="Bijwerken"
             />
           </>
+          )
         )}
-      </main>
+      </main >
     </>
   );
 };
