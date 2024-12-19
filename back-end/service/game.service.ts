@@ -55,12 +55,12 @@ const getGame = async ({ id }: { id: number }): Promise<Game> => {
 };
 
 const getUserGames = async (username: string) => {
-  try {
-    const userFound: User | null = await userDb.getUserByUsername({ username });
-    if (!userFound) {
-      throw new Error(`User with username: ${username} does not exist.`);
-    }
+  const userFound: User | null = await userDb.getUserByUsername({ username });
+  if (!userFound) {
+    throw new Error(`User with username: ${username} does not exist.`);
+  }
 
+  try {
     const games = await gameDb.getGamesByUser({ username });
 
     return games;

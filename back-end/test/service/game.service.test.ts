@@ -1,8 +1,6 @@
 import gameService from '../../service/game.service';
 import gameDb from '../../repository/game.db';
 import userDb from '../../repository/user.db';
-import intensityDb from '../../repository/intensity.db';
-import tagDb from '../../repository/tag.db';
 import { Game } from '../../model/game';
 import { User } from '../../model/user';
 import { Intensity } from '../../model/intensity';
@@ -63,99 +61,103 @@ const game = new Game({
   tags
 });
 
-// Mocks
-let mockUserDbGetUserById: jest.Mock;
-let mockIntensityDbGetIntensityById: jest.Mock;
-let mockTagDbGetTagByTag: jest.Mock;
-let mockTagDbCreateTag: jest.Mock;
-let mockGameDbGetAllGames: jest.Mock;
-let mockGameDbCreateGame: jest.Mock;
-
 beforeEach(() => {
-  mockUserDbGetUserById = jest.fn();
-  mockIntensityDbGetIntensityById = jest.fn();
-  mockTagDbGetTagByTag = jest.fn();
-  mockTagDbCreateTag = jest.fn();
-  mockGameDbGetAllGames = jest.fn();
-  mockGameDbCreateGame = jest.fn();
-});
-
-afterEach(() => {
   jest.clearAllMocks();
 });
 
-// Tests
 test('given: games exist in database, when: getAllGames is called, then: all games are returned', async () => {
   // Given
-  gameDb.getAllGames = mockGameDbGetAllGames.mockResolvedValue([game]);
+  jest.spyOn(gameDb, 'getAllGames').mockResolvedValue([game]);
 
   // When
   const result = await gameService.getAllGames();
 
   // Then
   expect(result).toEqual([game]);
-  expect(mockGameDbGetAllGames).toHaveBeenCalledTimes(1);
+  expect(gameDb.getAllGames).toHaveBeenCalledTimes(1);
 });
 
-test('given: user and intensity are valid, when: createGame is called, then: the game is created successfully', async () => {
+test('given: multiple games exist, when: getGamesRandom is called, then: all games are returned in random order', async () => {
   // Given
-  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(user);
-  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
-  tagDb.getTagByTag = mockTagDbGetTagByTag.mockResolvedValue(null); // simulate tag not found
-  tagDb.createTag = mockTagDbCreateTag.mockResolvedValue(tags[0]);
-
-  gameDb.createGame = mockGameDbCreateGame.mockResolvedValue(game);
+  const game2: Game = game;
+  game2.setName('Game 2')
+  const games: Game[] = [game, game2];
+  jest.spyOn(gameDb, 'getAllGames').mockResolvedValue(games);
 
   // When
-  const result = await gameService.createGame(gameInput);
+  const result = await gameService.getGamesRandom();
+
+  // Then
+  expect(result).toHaveLength(games.length);
+  expect(gameDb.getAllGames).toHaveBeenCalledTimes(1);
+});
+
+test('given: filter parameters are provided, when: getFilteredGames is called, then: filtered games are returned', async () => {
+  // Given
+  jest.spyOn(gameDb, 'getFilteredGames').mockResolvedValue([game]);
+  const filters = {
+    tags: ['outdoor'],
+    intensityId: 1,
+    groups: true,
+    duration: 30
+  };
+
+  // When
+  const result = await gameService.getFilteredGames(filters);
+
+  // Then
+  expect(gameDb.getFilteredGames).toHaveBeenCalledWith({
+    tags: filters.tags,
+    intensityId: filters.intensityId,
+    groups: filters.groups,
+    durationRange: {
+      gte: filters.duration * 0.8,
+      lte: filters.duration * 1.2
+    }
+  });
+  expect(result).toEqual([game]);
+});
+
+test('given: game exists in database, when: getGame is called with valid id, then: game is returned', async () => {
+  // Given
+  jest.spyOn(gameDb, 'getGameById').mockResolvedValue(game);
+
+  // When
+  const result = await gameService.getGame({ id: 1 });
 
   // Then
   expect(result).toEqual(game);
-  expect(mockUserDbGetUserById).toHaveBeenCalledTimes(1);
-  expect(mockIntensityDbGetIntensityById).toHaveBeenCalledTimes(1);
-  expect(mockTagDbGetTagByTag).toHaveBeenCalledTimes(2); // For both tags
-  expect(mockTagDbCreateTag).toHaveBeenCalledTimes(2); // Tags are created if not found
-  expect(mockGameDbCreateGame).toHaveBeenCalledTimes(1);
+  expect(gameDb.getGameById).toHaveBeenCalledWith({ id: 1 });
 });
 
-test('given: user id is missing, when: createGame is called, then: throw an error', async () => {
+test('given: game does not exist, when: getGame is called with invalid id, then: error is thrown', async () => {
   // Given
-  const invalidGameInput = { ...gameInput, user: { ...userInput, id: undefined } };
+  jest.spyOn(gameDb, 'getGameById').mockResolvedValue(null);
 
-  // When / Then
-  await expect(gameService.createGame(invalidGameInput)).rejects.toThrow('User id is required.');
+  // When/Then
+  await expect(gameService.getGame({ id: 999 }))
+    .rejects.toThrow('Game with id: 999 does not exist.');
 });
 
-test('given: intensity id is missing, when: createGame is called, then: throw an error', async () => {
+test('given: valid username with games, when: getUserGames is called, then: user games are returned', async () => {
   // Given
-  const invalidGameInput = { ...gameInput, intensity: { ...intensityInput, id: undefined } };
-
-  // When / Then
-  await expect(gameService.createGame(invalidGameInput)).rejects.toThrow('Intensity id is required.');
-});
-
-test('given: user or intensity not found, when: createGame is called, then: throw an error', async () => {
-  // Given
-  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(null); // User not found
-  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
-
-  // When / Then
-  await expect(gameService.createGame(gameInput)).rejects.toThrow('User not found with the given ID');
-});
-
-test('given: tags not found, when: createGame is called, then: create and associate tags', async () => {
-  // Given
-  userDb.getUserById = mockUserDbGetUserById.mockResolvedValue(user);
-  intensityDb.getIntensityById = mockIntensityDbGetIntensityById.mockResolvedValue(intensity);
-  tagDb.getTagByTag = mockTagDbGetTagByTag.mockResolvedValue(null); // Tags not found
-  tagDb.createTag = mockTagDbCreateTag.mockResolvedValue(tags[0]);
-
-  gameDb.createGame = mockGameDbCreateGame.mockResolvedValue(game);
+  jest.spyOn(userDb, 'getUserByUsername').mockResolvedValue(user);
+  jest.spyOn(gameDb, 'getGamesByUser').mockResolvedValue([game]);
 
   // When
-  const result = await gameService.createGame(gameInput);
+  const result = await gameService.getUserGames('John Doe');
 
   // Then
-  expect(mockTagDbCreateTag).toHaveBeenCalledTimes(2); // Both tags should be created
-  expect(result).toEqual(game);
+  expect(result).toEqual([game]);
+  expect(userDb.getUserByUsername).toHaveBeenCalledWith({ username: 'John Doe' });
+  expect(gameDb.getGamesByUser).toHaveBeenCalledWith({ username: 'John Doe' });
+});
+
+test('given: username does not exist, when: getUserGames is called, then: error is thrown', async () => {
+  // Given
+  jest.spyOn(userDb, 'getUserByUsername').mockResolvedValue(null);
+
+  // When/Then
+  await expect(gameService.getUserGames('NonexistentUser'))
+    .rejects.toThrow('User with username: NonexistentUser does not exist.');
 });
