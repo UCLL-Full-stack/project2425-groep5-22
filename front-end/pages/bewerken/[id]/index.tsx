@@ -157,7 +157,9 @@ const Update = () => {
         throw new Error(errorData.message || 'Failed to update game');
       }
 
-      router.push('/');
+      const newUpdatedGame: Game = await response.json();
+
+      router.push('/spel/' + newUpdatedGame.id + "/" + newUpdatedGame.name.toLowerCase().replace(' ', '-'));
     } catch (error) {
       console.error('Error submitting form:', error);
       setApiError('Er is een fout opgetreden bij het bijwerken van het spel');

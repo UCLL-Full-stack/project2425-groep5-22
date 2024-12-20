@@ -40,7 +40,7 @@ const GameDetails: React.FC<Props> = ({ game, user }) => {
           return;
         }
 
-        router.push('/spelletjes');
+        router.push('/');
         return
       } catch {
         setError('Er is iets misgelopen, probeer het later opnieuw.')

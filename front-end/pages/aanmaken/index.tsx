@@ -141,7 +141,9 @@ const Create = () => {
         throw new Error(errorData.message || 'Failed to create game');
       }
 
-      router.push('/');
+      const newGame: Game = await response.json();
+
+      router.push('/spel/' + newGame.id + "/" + newGame.name.toLowerCase().replace(' ', '-'));
     } catch (error) {
       console.error('Error submitting form:', error);
       setApiError('Er is een fout opgetreden bij het opslaan van het spel');
