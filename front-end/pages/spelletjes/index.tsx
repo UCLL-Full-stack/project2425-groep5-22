@@ -88,6 +88,15 @@ const Games = () => {
     setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
   };
 
+  const resetFilters = () => {
+    setFilters({
+      tags: [],
+      intensityId: null,
+      groups: null,
+      duration: null,
+    })
+  }
+
   if (!currentUser || !intensitiesAndTags || authError) return <Loader />;
 
   return (
@@ -117,7 +126,7 @@ const Games = () => {
                 filters={filters}
                 setFilters={setFilters}
                 handleFilterChange={handleFilterChange}
-                loading={isValidating}
+                resetFilters={resetFilters}
                 tags={intensitiesAndTags.tags as Tag[]}
                 intensities={intensitiesAndTags.intensities as Intensity[]}
               />

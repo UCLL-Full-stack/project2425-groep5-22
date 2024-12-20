@@ -10,13 +10,13 @@ import tagService from '@/services/TagService';
 type Props = {
   filters: Filter,
   setFilters: Function,
-  handleFilterChange: Function
-  loading: boolean,
+  handleFilterChange: Function,
+  resetFilters: Function,
   tags: Tag[],
   intensities: Intensity[]
 }
 
-const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange, loading, tags, intensities }) => {
+const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange, resetFilters, tags, intensities }) => {
   return (
     <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
       <div>
@@ -79,12 +79,15 @@ const FilterInput: React.FC<Props> = ({ filters, setFilters, handleFilterChange,
         <input
           type="number"
           placeholder="120"
-          value={filters.duration?.toString()}
+          value={filters.duration as number}
           className="input"
           onChange={(e) =>
             handleFilterChange('duration', e.target.value ? Number(e.target.value) : null)
           }
         />
+      </div>
+      <div className="flex items-center justify-end w-full col-span-full" onClick={() => resetFilters()}>
+        <button className='text-sm underline hover:opacity-75'>Herstellen</button>
       </div>
     </div>
   );
